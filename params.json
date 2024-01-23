@@ -1,0 +1,7 @@
+{
+  "name": "Scalable splitting algorithms for SKA",
+  "tagline": "MATLAB source code",
+  "body": "### Introduction\r\nMotivated by the planned construction of the Square Kilometre Array, which will become the largest sensor ever built by humankind and will acquire unprecedented amounts of data in radio astronomy, we developed two convex optimisation algorithms for solving the radio interferometric imaging problem. They are tailored for big-data and employ parallel and distributed computations to achieve scalability, in terms of memory and computational requirements.\r\nThe code made available here represents a proof of concept MATLAB implementation of the two proposed algorithms.\r\n\r\n### Authors\r\n* Dr. Alexandru Onose\r\n* Dr. Rafael E. Carrillo\r\n* Dr. Audrey Repetti\r\n* Dr. Jason D. McEwen\r\n* Dr. Jean-Philippe Thiran\r\n* Dr. Jean-Christophe Pesquet\r\n* Dr. Yves Wiaux\r\n\r\n### Article\r\nA. Onose, R. E. Carrillo, A. Repetti, J. D. McEwen, J.-P. Thiran, J.-C. Pesquet, and Y. Wiaux - _**Scalable splitting algorithms for big-data interferometric imaging in the SKA era**,\r\nMNRAS [doi:10.1093/mnras/stw1859](http://dx.doi.org/10.1093/mnras/stw1859) first published online August 1, 2016_",
+  "google": "UA-82326814-1",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}

@@ -1,5 +1,4 @@
 from lib.operator import operator
-from lib.operator_sparse import operator as operator_sparse
 from data import transforms as T
 
 import torch

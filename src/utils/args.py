@@ -80,6 +80,7 @@ def parse_args_inference():
                         iteration will be saved.')
     parser.add_argument('--res_on_gpu', action='store_true',
                         help='If True, residual computation will be done on GPU.')
+    parser.add_argument('--imweight_name', type=str, default='nWimag', help='Name of variable containing imweight in the uv file. Default is nWimag.')
     
     parser.add_argument('--num_chans', type=int, default=64,
                         help='Number of UNet channels')

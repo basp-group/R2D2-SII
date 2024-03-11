@@ -26,7 +26,7 @@ def get_DNNs(args, device=None):
         device = args.device
     dnns_dict = {}
     for i in range(args.num_iter):
-        dnn = glob.glob(f'{args.ckpt_path}/*N{i+1}*.ckpt')
+        dnn = glob.glob(f'{args.ckpt_path}/*N{i+1}.ckpt')
         if len(dnn) == 0:
             raise ValueError(f'Checkpoint for N{i+1} not found')
         elif len(dnn) >1:

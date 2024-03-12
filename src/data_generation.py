@@ -3,7 +3,7 @@ import argparse
 import pathlib
 import numpy as np
 from astropy.io import fits
-from scipy.io import loadmat
+from scipy.io import loadmat, savemat
 import torch
 from tqdm import tqdm
 
@@ -41,20 +41,30 @@ def gen_dirty(args):
     on_gpu : bool, optional
         If True, dirty images will be computed on gpu, by default False.
     """
+    print(f'Generating dirty images for {args.dataset} set ...')
     gdth_paths = list(pathlib.Path(args.gdth_path).iterdir())
+    print(f'from {len(gdth_paths)} ground truth images ...')
     im_size = fits.getdata(gdth_paths[0]).squeeze().shape
     device = torch.device('cuda') if args.on_gpu else torch.device('cpu')
     op = operator(im_size=im_size, op_type=args.operator_type, op_acc='exact', device=device)
+    if not os.path.exists(args.output_path):
+        os.makedirs(args.output_path)
+    args.output_dirty_path = f'{args.output_path}/{args.dataset}set_dirty'
     if not os.path.exists(args.output_dirty_path):
         os.makedirs(args.output_dirty_path)
-    if args.expo and not os.path.exists(args.output_gdth_path):
-        os.makedirs(args.output_gdth_path)
+    if args.expo:
+        args.output_gdth_path = f'{args.output_path}/{args.dataset}set_gdth'
+        if not os.path.exists(args.output_gdth_path):
+            os.makedirs(args.output_gdth_path)
+        args.output_epsilon_path = f'{args.output_path}/{args.dataset}set_epsilon'
+        if not os.path.exists(args.output_epsilon_path):
+            os.makedirs(args.output_epsilon_path)
 
     for gdth_file in tqdm(gdth_paths):
         gdth = read_fits_as_tensor(gdth_file).to(device)
-        fname = gdth_file.name.split('_gdth')[0]
-        fname_uv = fname.split('_id')[1]
-        uv_file = f'{args.uv_path}/uv_id{fname_uv}.mat'
+        fname = gdth_file.name.split('.fits')[0].split('_gdth')[0]
+        fname_uv = fname.split('_id_')[1]
+        uv_file = f'{args.uv_path}/uv_id_{fname_uv}.mat'
         uv, imweight = read_uv(uv_file, args.super_resolution, args.imweight_name, device)
         op.set_uv_imweight(uv, imweight)
         if args.sigma_range is not None:
@@ -72,11 +82,15 @@ def gen_dirty(args):
             tau = 0
             
         if args.expo:
+            assert args.sigma_range is not None, 'sigma_range should be provided for exponentiation.'
             assert args.sigma0 > 0, 'sigma0 should be greater than 0 for exponentiation.'
             assert sigma < args.sigma0, 'sigma should be greater than sigma0 for exponentiation.'
             expo_factor = solve_expo_factor(args.sigma0, sigma.numpy(force=True))
             gdth = (expo_factor**gdth - 1) / expo_factor
             fits.writeto(os.path.join(args.output_gdth_path, f'{fname}_gdth.fits'), gdth.squeeze().numpy(force=True), overwrite=True)
+            savemat(os.path.join(args.output_epsilon_path, f'{fname}_epsilon.mat'),
+                    {'sigma': sigma.item(),
+                     'true_noise_norm': np.linalg.norm(tau.squeeze().numpy(force=True))**2})
             
         dirty = op.backproj(gdth, tau=tau)
         fits.writeto(os.path.join(args.output_dirty_path, f'{fname}_dirty.fits'), dirty.squeeze().numpy(force=True), overwrite=True)

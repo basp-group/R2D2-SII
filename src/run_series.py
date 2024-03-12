@@ -62,7 +62,8 @@ if __name__ == "__main__":
         start_dnn = timeit.default_timer()
         # load network weights from cpu to gpu
         net = load_net(net, i+1, args, dnns_dict)
-        torch.cuda.synchronize()
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
         with torch.no_grad():
             output = forward(args, i, net, res_n, output_n, data, mean, op_R2D2Net)
         dnn_time = timeit.default_timer() - start_dnn
@@ -86,6 +87,9 @@ if __name__ == "__main__":
         output_n, mean = T.normalize_instance(output, eps=1e-110)
         res_n = T.normalize(res, mean.to(args.res_device), eps=1e-110)
         vprint('', args.verbose, 1)
+    if pool is not None:
+        pool.close()
+        # pool.join()
     imaging_time = timeit.default_timer() - start_imaging
     ################################################################################################
     print(f'{args.series} algorithm finished.')
@@ -106,12 +110,11 @@ if __name__ == "__main__":
     
     # save reconstruction and residual dirty images
     if args.save_all_outputs:
-        for i in range(args.num_iter):
+        for i in range(args.num_iter-1):
             fits.writeto(f'{args.output_path}/{args.fname}_rec_N{i+1}.fits', rec_dict[f'N{i+1}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
             fits.writeto(f'{args.output_path}/{args.fname}_res_N{i+1}.fits', res_dict[f'N{i+1}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
-    else:
-        fits.writeto(f'{args.output_path}/{args.fname}_rec_N{args.num_iter}.fits', rec_dict[f'N{args.num_iter}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
-        fits.writeto(f'{args.output_path}/{args.fname}_res_N{args.num_iter}.fits', res_dict[f'N{args.num_iter}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
+    fits.writeto(f'{args.output_path}/{args.fname}_model_image.fits', rec_dict[f'N{args.total_num_iter}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
+    fits.writeto(f'{args.output_path}/{args.fname}_residual_image.fits', res_dict[f'N{args.total_num_iter}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
 
     print('-' * 10)
     print('** Evaluation metrics')

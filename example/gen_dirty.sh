@@ -1,15 +1,28 @@
 #!/bin/bash
-DATA_PATH=path_to_data
-UV_PATH=$DATA_PATH/uv/
-EXT=testset_fullnumpy
-GDTH_PATH=$DATA_PATH/$EXT/
-OUT_DIRTY=$DATA_PATH/$EXT\_dirty/
-OUT_GDTH=$DATA_PATH/$EXT/
+gdth_path=              # string, path to the ground truth files
+uv_path=                # string, path to the uv files
+output_path=            # string, main path to save the output, subdirectories will be created
+dataset=                # string, choose from training, validation and test
+super_resolution=       # scalar, super resolution factor
+imweight_name=nWimag    # string, name of weighting variable in uv files, default is nWimag, if multiple, separate by comma
+# Operator
+operator_type=table     # choose between table and sprase_matrix, former is faster, latter is slightly more accurate
 
-python3 src/data_generation.py dirty --uv_path $UV_PATH \
---gdth_path $GDTH_PATH \
---briggs \
---sigma0 0.001 --expo \
---sigma_range 2e-6 1e-3 \
---output_dirty_path $OUT_DIRTY \
---output_gdth_path $OUT_GDTH
+# For exponentiation, optional, comment out arguments if not used
+sigma0=                 # scalar, 1/ current dynamic range of the ground truth images
+expo=--expo             # flag, use exponentiation
+# NOTE: please replace the sigma_range argument
+
+# For Briggs weighting
+briggs=--briggs         # flag, use Briggs weighting
+
+python3 src/data_generation.py dirty \
+--gdth_path $gdth_path \
+--output_path $output_path \
+--uv_path $uv_path \
+--dataset $dataset \
+--super_resolution $super_resolution \
+--sigma0 $sigma0 $expo \
+--sigma_range 2e-6 1e-3 $briggs \
+--operator_type $operator_type \
+--imweight_name $imweight_name

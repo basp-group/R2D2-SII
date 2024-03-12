@@ -211,20 +211,18 @@ def parse_args_data_gen():
 
     subparsers = main_parser.add_subparsers(dest='data_type')
     dirty_parser = subparsers.add_parser('dirty', help='Generate dirty images')
-    dirty_parser.add_argument('--gdth_path', type=str, help='Path to ground truth images.')
+    dirty_parser.add_argument('--gdth_path', type=str, required=True, help='Path to ground truth images.')
+    dirty_parser.add_argument('--output_path', type=str, required=True, help='Main path to save output images and data, subdirectories will be created.')
+    dirty_parser.add_argument('--uv_path', type=str, required=True, help='Path to uv data')
+    dirty_parser.add_argument('--dataset', choices=['training', 'validation', 'test'], required=True, help='Choose between training, validation and test dataset.')
     dirty_parser.add_argument('--super_resolution', type=float, default=1., help='Super-resolution factor.')
     dirty_parser.add_argument('--sigma_range', type=float, nargs='+', default=[2e-6,1e-3], help='Standard deviation for the noise to be added to measurement.')
     dirty_parser.add_argument('--briggs', action='store_true', help='If True, briggs weighting will be applied.')
     dirty_parser.add_argument('--expo', action='store_true', help='If True, ground truth will be exponentiated.')
     dirty_parser.add_argument('--sigma0', type=float, default=0., help='1/ current dynamic range of the ground truth image.')
-    dirty_parser.add_argument('--output_dirty_path', type=str, help='Path to save output dirty images.')
-    dirty_parser.add_argument('--output_gdth_path', type=str, help='Path to save output exponentiated ground truth images.')
-    dirty_parser.add_argument('--output_epsilon_path', type=str, help='Path to save true noise norm in a .mat file.')
-    dirty_parser.add_argument('--uv_path', type=str, help='Path to uv data')
-    dirty_parser.add_argument('--imweight_name', type=str, default='nWimag', help='Name of variable containing imweight in the uv file. Default is nWimag.')
+    dirty_parser.add_argument('--imweight_name', type=str, default='nWimag', help='Name of variable containing imweight in the uv file. Default is nWimag. If multiple, separate by comma.')
     dirty_parser.add_argument('--operator_type', choices=['table', 'sparse_matrix'], default='table',
                               help='NUFFT for residual dirty image computation using either table interpolation or precomputed sparse matrix.')
-    
     dirty_parser.add_argument('--on_gpu', action='store_true', help='If True, dirty images will be computed on gpu.')
 
     residual_parser = subparsers.add_parser('residual', help='Generate residual dirty images')

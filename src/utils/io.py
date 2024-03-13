@@ -132,10 +132,10 @@ def get_data(args):
                 uv = uv[0, :, flag]
                 imweight = imweight[0, 0, flag]
         op.set_uv_imweight(uv, imweight)
-        ts = timeit.default_timer()
         y = data['y'].squeeze() #* data['nW'].squeeze()
         y = y.real.astype(np.float32) + 1j * y.imag.astype(np.float32)
         y = torch.tensor(y).unsqueeze(0).unsqueeze(0).to(args.res_device) * imweight
+        ts = timeit.default_timer()
         dirty = op.backproj_data(y).to(args.device)
         dirty_time = timeit.default_timer() - ts
         print(f'INFO: time to compute dirty image (normalized backprojected data): {dirty_time:.6f} sec')

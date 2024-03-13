@@ -81,7 +81,7 @@ The groundtruth file `$GT_FILE` is in `.fits` format. The file is optional, used
 
 ## Usage and Example
 ### Imaging / Test stage
-The R2D2 algorithm (R2D2/R3D3) can be run using the following command. The final reconstructions which consist of the image estimate and associated residual dirty image are saved in `$RESULTS_DIR`. The intermediate reconstructions can also be saved by using the `--save_all_outputs` argument.
+The R2D2 algorithm (R2D2/R3D3) can be run using the following command in terminal. The final reconstructions which consist of the image estimate and associated residual dirty image are saved in `$RESULTS_DIR`. The intermediate reconstructions can also be saved by using the `--save_all_outputs` argument.
 ``` bash
 python3 ./src/run_series.py \
 --data_file $DATA_FILE        `# Path to the input .mat data file.` \
@@ -107,7 +107,7 @@ python3 ./src/run_series.py \
    - To run the first term in the R2D2 (respectively, R3D3) series which corresponds to the end-to-end DNN U-Net (respectively, R2D2-Net) set `num_iter` to `I=1`.
    - The parameter `target_dyanamic_range` (`$DR`) is optional and is used to compute the logSNR metric when the groundtruth image is available.
 
-   - Examples are provided in [`./example`](example).
+   - Examples are provided as bash shell scripts in [`./example`](example).
 
  ### Training
  The instruction on training will be available soon.

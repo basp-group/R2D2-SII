@@ -2,7 +2,9 @@
 ![language](https://img.shields.io/badge/language-python-orange.svg)
 [![license](https://img.shields.io/badge/license-GPL--3.0-brightgreen.svg)](LICENSE)
 
-# Description
+- [R2D2: **R**esidual-to-**R**esidual **D**NN series for high-**D**ynamic range imaging](#R2D2-Algorithm)
+
+## Description
 The R2D2 algorithm takes a hybrid structure between a Plug-and-Play (PnP) algorithm and a learned version of the well-know "Matching Pursuit" algorithm. Its reconstruction is formed as a series of residual images, iteratively estimated as outputs of Deep Neural Networks (DNNs) taking the previous iteration’s image estimate and associated data residual as inputs. R2D2's primary application is to solve large-scale high-resolution high-dynamic range inverse problems in radio astronomy, more specifically 2D planar monochromatic intensity imaging. 
 Please refer to the following papers:
 
@@ -20,7 +22,7 @@ This section describes the usage of the R2D2-RI platform for:
 - training the DNNs (include generating appropriate data as input to DNNs)
 -->
 
-# Dependencies
+## Dependencies
 PyTorch and torchvision should be installed separately by following instruction [here](https://pytorch.org/get-started/locally/) to ensure their latest version available for your CUDA version is installed. If your CUDA version is older than 11.8, then you can find the instruction [here](https://pytorch.org/get-started/previous-versions/). For example, to install PyTorch with CUDA version 11.6, use the command below:
 ```
 pip install torch==1.13.1+cu116 torchvision==0.14.1+cu116 --extra-index-url https://download.pytorch.org/whl/cu116
@@ -31,7 +33,7 @@ All other required Python packages are listed in the [requirements](requirements
    ``` bash
    pip install -r requirements.txt
    ```
-# Input files
+## Input files
 Both R2D2 and R3D3 series are trained specifically for images of size `512x512`, with a super resolution factor (defining the pixel-resolution) set to `1.5`, and using the data-weighting scheme Briggs. To run the R2D2 algorithm, data and DNN files are required.
 
 ### VLA-trained DNN series 
@@ -74,7 +76,7 @@ The current code takes as input data a measurement file in ``.mat`` format conta
 The groundtruth file `$GT_FILE` is in `.fits` format. The file is optional, used to compute the reconstruction evaluation metrics.
 
 
-# Imaging / Test stage
+## Imaging / Test stage
 The R2D2 algorithm (R2D2/R3D3) can be run using the following command. The final reconstructions which consist of the image estimate and associated residual dirty image are saved in `$RESULTS_DIR`. The intermediate reconstructions can also be saved by using the `--save_all_outputs` argument.
 ``` python
 python3 ./src/run_series.py \   

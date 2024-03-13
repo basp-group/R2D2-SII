@@ -83,21 +83,21 @@ The groundtruth file `$GT_FILE` is in `.fits` format. The file is optional, used
 ### Imaging / Test stage
 The R2D2 algorithm (R2D2/R3D3) can be run using the following command. The final reconstructions which consist of the image estimate and associated residual dirty image are saved in `$RESULTS_DIR`. The intermediate reconstructions can also be saved by using the `--save_all_outputs` argument.
 ``` bash
-python3 ./src/run_series.py \   
---data_file $DATA_FILE \       # Path to the input .mat data file.
---ckpt_path $CHECKPOINT_DIR \  # Path to the directory of the DNN checkpoints.
---output_path $RESULTS_DIR \   # Path to the final fits files.
---series $INCARNATION \        # Incarnation of the R2D2 algorithm: "R2D2" or "R3D3".
---num_iter $I \                # Number of DNNs in the R2D2/R3D3 series
---layers $J \                  # Number of network layers in the DNN architecture. Currently acceptable values 1, 3, 6.
---super_resolution 1.5 \       # Super resolution factor.
---im_dim_x 512 \               # Image width.
---im_dim_y 512 \               # Image height.
---save_all_outputs \           # (optional) Save all intermediate outputs, otherwise only final iteration results will be saved.
---gdth_file $GT_FILE \         # (optional) Path to the ground truth fits file.
---target_dynamic_range $DR \   # (optional) Target dynamic range for computation of logSNR metric.
---res_on_gpu \                 # (optional) Compute residual dirty images on GPU to significantly accelerate overall imaging time.
---operator_type $OP_TYPE       # (optional) choose from [table, sparse_matrix], default to `table` which is faster, `sparse_matrix` is relatively more accurate.
+python3 ./src/run_series.py \
+--data_file $DATA_FILE        `# Path to the input .mat data file.` \
+--ckpt_path $CHECKPOINT_DIR   `# Path to the directory of the DNN checkpoints.` \
+--output_path $RESULTS_DIR    `# Path to the final fits files.` \
+--series $INCARNATION         `# Incarnation of the R2D2 algorithm: "R2D2" or "R3D3".` \
+--num_iter $I                 `# Number of DNNs in the R2D2/R3D3 series` \
+--layers $J                   `# Number of network layers in the DNN architecture. Currently acceptable values 1, 3, 6.` \
+--super_resolution 1.5        `# Super resolution factor.` \
+--im_dim_x 512                `# Image width.` \
+--im_dim_y 512                `# Image height.` \
+--save_all_outputs            `# (optional) Save all intermediate outputs, otherwise only final iteration results will be saved.` \
+--gdth_file $GT_FILE          `# (optional) Path to the ground truth fits file.` \
+--target_dynamic_range $DR    `# (optional) Target dynamic range for computation of logSNR metric.` \
+--res_on_gpu                  `# (optional) Compute residual dirty images on GPU to significantly accelerate overall imaging time.` \
+--operator_type $OP_TYPE      `# (optional) choose from [table, sparse_matrix], default to 'table' which is faster, 'sparse_matrix' is relatively more accurate.`
 ```
 - **Notes:** 
    - The parameter `layers` takes different values depending on the considered incarnation of the R2D2 algorithm.

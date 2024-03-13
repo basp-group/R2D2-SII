@@ -82,7 +82,7 @@ The groundtruth file `$GT_FILE` is in `.fits` format. The file is optional, used
 ## Usage and Example
 ### Imaging / Test stage
 The R2D2 algorithm (R2D2/R3D3) can be run using the following command. The final reconstructions which consist of the image estimate and associated residual dirty image are saved in `$RESULTS_DIR`. The intermediate reconstructions can also be saved by using the `--save_all_outputs` argument.
-``` python
+``` bash
 python3 ./src/run_series.py \   
 --data_file $DATA_FILE \       # Path to the input .mat data file.
 --ckpt_path $CHECKPOINT_DIR \  # Path to the directory of the DNN checkpoints.

@@ -1,10 +1,10 @@
 # R2D2 Algorithm
 
 # Description
-The R2D2 algorithm takes a hybrid structure between a Plug-and-Play (PnP) algorithm and a learned version of the well-know "Matching Pursuit" algorithm. Its reconstruction is formed as a series of residual images, iteratively estimated as outputs of Deep Neural Networks (DNNs) taking the previous iteration’s image estimate and associated data residual as inputs. R2D2's primary application is to solve large-scale high-resolution high-dynamic range inverse problems in radio astronomy, more specifically 2D planar monochromatic intensity imaging. 
+The R2D2 algorithm takes a hybrid structure between a Plug-and-Play (PnP) algorithm and a learned version of the well-know Matching Pursuit algorithm. Its reconstruction is formed as a series of residual images, iteratively estimated as outputs of Deep Neural Networks (DNNs) taking the previous iteration’s image estimate and associated data residual as inputs. R2D2's primary application is to solve large-scale high-resolution high-dynamic range inverse problems in radio astronomy, more specifically 2D planar monochromatic intensity imaging. 
 Please refer to the following papers:
 
->[1] Aghabiglou, A., Chu, C. S., Dabbech, A., & Wiaux, Y. (2024). [The R2D2 deep neural network series paradigm for fast precision imaging in radio astronomy](https://arxiv.org/abs/2403.05452),  submitted to ApJ, preprint arXiv:2403.05452.
+>[1] Aghabiglou, A., Chu, C. S., Dabbech, A., & Wiaux, Y. (2024). [The R2D2 deep neural network series paradigm for fast precision imaging in radio astronomy](https://arxiv.org/abs/2403.05452),  submitted to ApJS, preprint arXiv:2403.05452.
 >
 >[2] Aghabiglou, A., Chu, C. S., Jackson, A., Dabbech, A., & Wiaux, Y. (2023). [Ultra-fast high-dynamic range imaging of Cygnus A with the R2D2 deep neural network series](https://arxiv.org/abs/2309.03291), submitted to ApJL, preprint arXiv:2309.03291.
 >
@@ -24,7 +24,7 @@ git clone -b matlab https://github.com/basp-group/R2D2-RI.git
 ```bash
 git clone -b matlab git@github.com:basp-group/R2D2-RI.git
 ```
-The full path to this repository is referred to as `$R2D2RI` in the rest of the documentation.
+The full path to this repository is referred to as `$R2D2` in the rest of the documentation.
 
 ### MATLAB Dependencies
 To build the radio-interferometric measurement operator, the repository relies on the submodule
@@ -36,10 +36,10 @@ To build the radio-interferometric measurement operator, the repository relies o
 > 
 > [5] Dabbech, A., Wolz, L., Pratley, L., McEwen, J. D., & Wiaux, Y. (2017). The w-effect in interferometric imaging: from a fast sparse measurement operator to superresolution, *MNRAS*, 471(4), 4300-4313.
       
-Clone the submodule in `$R2D2RI/lib/` using the command below:
+Clone the submodule in `$R2D2/lib/` using the command below:
 
 ```bash
-cd $R2D2RI/lib/
+cd $R2D2/lib/
 git clone   https://github.com/basp-group/RI-measurement-operator.git
 ```
 # Input files
@@ -84,14 +84,14 @@ The input data file `$DATA_FILE` is expected to be in `.mat` format, with the fo
    ```
 - **Notes:**
     - Briggs weights are generated using the [WSClean software](https://wsclean.readthedocs.io/en/latest/) with the Briggs parameter set to `0`.
-    - To extract the data file from Measurement Set Tables (MS), you can use the utility Python script `$R2D2RI/pyxisMs2mat/pyxis_ms2mat.py`. Full instructions are available in the [ReadMe File](https://github.com/basp-group-private/R2D2-RI/blob/matlab/pyxisMs2mat/ReadMe.md).
+    - To extract the data file from Measurement Set Tables (MS), you can use the utility Python script `$R2D2/pyxisMs2mat/pyxis_ms2mat.py`. Full instructions are available in the [ReadMe File](https://github.com/basp-group/R2D2/blob/matlab-inference/pyxisMs2mat/ReadMe.md).
 
 ### Groundtruth file (optional)
 The groundtruth file `$GT_FILE` is in `.fits` format. The file is optional, used to compute the reconstruction evaluation metrics.
 
 
 # Imaging with the R2D2 algorithm
-The R2D2 algorithm (R2D2/R3D3) is run in MATLAB. Input parameters are specified in the configuration file `$R2D2RI/config/$JSON_FILE` which is in  `.json` format, structured as follows:
+The R2D2 algorithm (R2D2/R3D3) is run in MATLAB. Input parameters are specified in the configuration file `$R2D2/config/$JSON_FILE` which is in  `.json` format, structured as follows:
 
  ``` matlab
      ``main``
@@ -99,8 +99,8 @@ The R2D2 algorithm (R2D2/R3D3) is run in MATLAB. Input parameters are specified 
             "imDimy"             % scalar; image height.
             "dataFile"           % string; path to the input data file (.mat).
             "srcName"            % (optional) string; target source name.
-            "projectDir"         % (optional) string; project directory $R2D2RI. Default: "./".
-            "resultPath"         % (optional) string; results path. Default: $R2D2RI"/results".           
+            "projectDir"         % (optional) string; project directory $R2D2. Default: "./".
+            "resultPath"         % (optional) string; results path. Default: $R2D2"/results".           
             "verbose"            % (optional) logical; Default: true.
             "flagSaveAllOutputs" % (optional) logical; save files output of all iterations. Default: true.
 
@@ -124,7 +124,7 @@ The R2D2 algorithm (R2D2/R3D3) is run in MATLAB. Input parameters are specified 
 
 To run the R2D2 algorithm run the command below in MATLAB:
 ``` bash
-    run_imager($R2D2RI/config/$JSON_FILE);
+    run_imager($R2D2/config/$JSON_FILE);
 ```
-**Note:** Examples of the configuration files are in `$R2D2RI/config`.
+**Note:** Examples of the configuration files are in `$R2D2/config`.
 

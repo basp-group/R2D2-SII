@@ -1,4 +1,6 @@
 # R2D2 Algorithm
+![language](https://img.shields.io/badge/language-python-orange.svg)
+[![license](https://img.shields.io/badge/license-GPL--3.0-brightgreen.svg)](LICENSE)
 
 # Description
 The R2D2 algorithm takes a hybrid structure between a Plug-and-Play (PnP) algorithm and a learned version of the well-know "Matching Pursuit" algorithm. Its reconstruction is formed as a series of residual images, iteratively estimated as outputs of Deep Neural Networks (DNNs) taking the previous iteration’s image estimate and associated data residual as inputs. R2D2's primary application is to solve large-scale high-resolution high-dynamic range inverse problems in radio astronomy, more specifically 2D planar monochromatic intensity imaging. 

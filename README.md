@@ -3,6 +3,10 @@
 [![license](https://img.shields.io/badge/license-GPL--3.0-brightgreen.svg)](LICENSE)
 
 - [R2D2: **R**esidual-to-**R**esidual **D**NN series for high-**D**ynamic range imaging](#R2D2-Algorithm)
+   - [Description](#description)
+   - [Dependencies](#dependencies)
+   - [Input Files](#input-files)
+   - [Usage and Example](#usage-and-example)
 
 ## Description
 The R2D2 algorithm takes a hybrid structure between a Plug-and-Play (PnP) algorithm and a learned version of the well-know "Matching Pursuit" algorithm. Its reconstruction is formed as a series of residual images, iteratively estimated as outputs of Deep Neural Networks (DNNs) taking the previous iteration’s image estimate and associated data residual as inputs. R2D2's primary application is to solve large-scale high-resolution high-dynamic range inverse problems in radio astronomy, more specifically 2D planar monochromatic intensity imaging. 
@@ -75,8 +79,8 @@ The current code takes as input data a measurement file in ``.mat`` format conta
 ### Groundtruth file
 The groundtruth file `$GT_FILE` is in `.fits` format. The file is optional, used to compute the reconstruction evaluation metrics.
 
-
-## Imaging / Test stage
+## Usage and Example
+### Imaging / Test stage
 The R2D2 algorithm (R2D2/R3D3) can be run using the following command. The final reconstructions which consist of the image estimate and associated residual dirty image are saved in `$RESULTS_DIR`. The intermediate reconstructions can also be saved by using the `--save_all_outputs` argument.
 ``` python
 python3 ./src/run_series.py \   
@@ -105,6 +109,6 @@ python3 ./src/run_series.py \
 
    - Examples are provided in [`./example`](example).
 
- # Training
+ ### Training
  The instruction on training will be available soon.
 

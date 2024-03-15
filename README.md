@@ -25,6 +25,8 @@ This repository provides a full Python implementation of the R2D2 algorithm (in 
 
 The full path to this repository is referred to as `$R2D2` in the rest of the documentation.
 
+A MATLAB implementation of the R2D2 algorithm (imaging only) is available in the branch [`matlab-inference`](https://github.com/basp-group/R2D2/tree/matlab-inference).
+
 ## Dependencies
 Python version `3.10` or higher is required. PyTorch and torchvision should be installed separately by following the instructions from the [website](https://pytorch.org/get-started/locally/) to ensure their latest version available for your CUDA version is installed. For CUDA versions older than 11.8, follow the instructions from the [website](https://pytorch.org/get-started/previous-versions/). Below is an example of the command used to install PyTorch with CUDA version 11.6:
 ```

@@ -25,7 +25,7 @@
      {   "__comment": "R2D2 algorithm",
         "r2d2": {  
             "dnnSeries": "R3D3",
-            "ckptPath": "./r3d3_checkpoints/",
+            "ckptPath": "R3D3_8R2D2Nets/",
             "nIterations": 8,
             "nLayers": 6,
             "dnnGPU": true

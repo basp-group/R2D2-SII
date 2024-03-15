@@ -25,7 +25,7 @@
      {   "__comment": "R2D2 algorithm",
         "r2d2": {  
             "dnnSeries": "R2D2",
-            "ckptPath": "R2D2_Unet_SR15_BR0/",
+            "ckptPath": "R2D2_15Unet/",
             "nIterations": 15,
             "nLayers": 1,
             "dnnGPU": true

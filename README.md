@@ -23,6 +23,8 @@ Please refer to the following papers:
 
 This repository provides a full Python implementation of the R2D2 algorithm (in its two incarnations) at both training and imaging stages. 
 
+The full path to this repository is referred to as `$R2D2` in the rest of the documentation.
+
 ## Dependencies
 Python version `3.10` or higher is required. PyTorch and torchvision should be installed separately by following the instructions from the [website](https://pytorch.org/get-started/locally/) to ensure their latest version available for your CUDA version is installed. For CUDA versions older than 11.8, follow the instructions from the [website](https://pytorch.org/get-started/previous-versions/). Below is an example of the command used to install PyTorch with CUDA version 11.6:
 ```
@@ -65,7 +67,7 @@ The current code takes as input data a measurement file in ``.mat`` format conta
    "nW"              %% vector; inverse of the noise standard deviation 
    "nWimag"          %% vector; square root of the imaging weights if available (Briggs or uniform), empty otherwise
    "frequency"       %% scalar; observation frequency
-   "maxProjBaseline" %% scalar; maximum projected baseline (in units of the wavelength; formally  max(sqrt(u.^2+v.^2)))
+   "maxProjBaseline" %% scalar; maximum projected baseline (in units of the wavelength; formally max(sqrt(u.^2+v.^2)))
    ```
 
 - **Notes:**
@@ -76,7 +78,7 @@ The current code takes as input data a measurement file in ``.mat`` format conta
 #### Groundtruth file
 The groundtruth file `$GT_FILE` is in `.fits` format. The file is optional and is used to compute the reconstruction evaluation metrics. An example file `3c353_GTfits.fits` is provided in the folder [`$R2D2/data/3c353/`](data/3c353/).
 
-### Usage & example
+### Usage and example
 The R2D2 algorithm (R2D2/R3D3) can be run using the following command from the terminal. The final reconstructions which consist of the image estimate and associated residual dirty image (i.e., back-projected residual data) are saved in `$RESULTS_DIR`. The intermediate reconstructions (outputs of each iteration) can also be saved by using the `--save_all_outputs` argument.
 ``` Python
 python3 ./src/run_series.py \
@@ -95,10 +97,10 @@ python3 ./src/run_series.py \
 --res_on_gpu                  `# (optional) Compute residual dirty images on GPU to significantly accelerate overall imaging time.` \
 --operator_type $OP_TYPE      `# (optional) NUFFT interpolation: "table" or "sparse_matrix". Default: "table" which is faster, "sparse_matrix" is relatively more accurate.`
 ```
-- **Notes:** 
+- **Notes:**
    - The parameter `layers` (`$J`) takes different values depending on the considered incarnation of the R2D2 algorithm.
-     -  R2D2 series: set `layers` to `1`.
-     -  R3D3 series: set `layers` to a value higher than `1`. For the trained R3D3 realizations, `layers` can take the value `3` or `6`.
+     -  R2D2 series: `J=1`.
+     -  R3D3 series: to use the currently trained R3D3 realizations, set `J=3` or `J=6`.
 
    - To run the first term in the R2D2 (respectively, R3D3) series which corresponds to the end-to-end DNN U-Net (respectively, R2D2-Net) set `num_iter` (`$I`)  to `1`.
    - The parameter `target_dyanamic_range` (`$DR`) is optional and is used to compute the logSNR metric when the groundtruth image is available.

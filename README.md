@@ -1,6 +1,6 @@
 # R2D2 Algorithm
 
-# Description
+## Description
 The R2D2 algorithm takes a hybrid structure between a Plug-and-Play (PnP) algorithm and a learned version of the well-known Matching Pursuit algorithm. Its reconstruction is formed as a series of residual images, iteratively estimated as outputs of iteration-specific Deep Neural Networks (DNNs), each taking the previous iteration’s image estimate and associated back-projected data residual as inputs.  The R2D2 algorithm comes in two incarnations. The first uses the well-known U-Net architecture for
 its DNNs, and is simply referred to as R2D2. The second uses a more advanced architecture dubbed R2D2-Net, obtained by unrolling the R2D2 algorithm itself. In reference to its nesting structure, this incarnation is referred to as R3D3. The primary application of the R2D2 algorithm is to solve large-scale high-resolution high-dynamic range inverse problems in radio astronomy, more specifically 2D planar monochromatic intensity imaging.
 
@@ -13,7 +13,7 @@ Please refer to the following papers:
 
 This repository provides a MATLAB implementation of the R2D2 algorithm.
 
-# Installation
+## Installation
 
 ### Cloning the project
 To clone the project, you may consider one of the following set of instructions.
@@ -44,7 +44,7 @@ Clone the submodule in [`$R2D2/lib/`](lib) using the command below:
 cd $R2D2/lib/
 git clone  https://github.com/basp-group/RI-measurement-operator.git
 ```
-# Input files
+## Input files
 Both R2D2 and R3D3 series are trained to form images of size `512x512` from data acquired by the Very Large Array (VLA). The input dirty images (i.e., the back-projected data) are expected to have a pixel size corresponding to a super resolution factor of `1.5`, and to be obtained using the data-weighting scheme Briggs. To run the R2D2 algorithm, data and DNN files are required. To run the R2D2 algorithm, data and DNN files are required.
 
 ### Trained DNN series
@@ -90,7 +90,7 @@ The input data file `$DATA_FILE` is expected to be in `.mat` format, with the fo
 ### Groundtruth file (optional)
 The groundtruth file `$GT_FILE` is in `.fits` format. The file is optional and is used to compute the reconstruction evaluation metrics. An example file `3c353_GTfits.fits` is provided in the folder [`$R2D2/data/3c353/`](data/3c353/).
 
-# Imaging with the R2D2 algorithm
+## Imaging with the R2D2 algorithm
 The R2D2 algorithm (R2D2/R3D3) is run in MATLAB. Input parameters are specified in the configuration file `$JSON_FILE` which is in  `.json` format, structured as follows:
 
  ```Matlab

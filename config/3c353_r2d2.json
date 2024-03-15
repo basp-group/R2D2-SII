@@ -25,7 +25,7 @@
      {   "__comment": "R2D2 algorithm",
         "r2d2": {  
             "dnnSeries": "R2D2",
-            "ckptPath": "/work/sc004/shared/dataset_end2end/R2D2_dataset/2CH/R2D2_Unet_SR15_BR0/all_ONNX_modified_saved/",
+            "ckptPath": "R2D2_Unet_SR15_BR0/",
             "nIterations": 15,
             "nLayers": 1,
             "dnnGPU": true

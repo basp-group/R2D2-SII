@@ -16,9 +16,9 @@ its DNNs, and is simply referred to as R2D2. The second uses a more advanced arc
 
 Please refer to the following papers:
 
->[1] Aghabiglou, A., Chu, C. S., Dabbech, A., & Wiaux, Y., [The R2D2 deep neural network series paradigm for fast precision imaging in radio astronomy](https://arxiv.org/abs/2403.05452),  submitted to ApJS, 2024, *preprint arXiv:2403.05452*.
+>[1] Aghabiglou, A., Chu, C. S., Dabbech, A. & Wiaux, Y., [The R2D2 deep neural network series paradigm for fast precision imaging in radio astronomy](https://arxiv.org/abs/2403.05452),  submitted to ApJS, 2024, *preprint arXiv:2403.05452*.
 >
->[2] Aghabiglou, A., Chu, C. S., Jackson, A., Dabbech, A., & Wiaux, Y., [Ultra-fast high-dynamic range imaging of Cygnus A with the R2D2 deep neural network series](https://arxiv.org/abs/2309.03291), submitted to ApJL, 2023, *preprint arXiv:2309.03291*.
+>[2] Dabbech, A., Aghabiglou, A., Chu, C. S. & Wiaux, Y., [CLEANing Cygnus A deep and fast with R2D2](https://arxiv.org/abs/2309.03291), submitted to ApJL, 2023, *preprint arXiv:2309.03291*.
 >
 
 This repository provides a full Python implementation of the R2D2 algorithm (in its two incarnations) at both training and imaging stages. 

@@ -1,14 +1,10 @@
-# scripts to create Fourier sampling patterns in .mat files containing the fields:
-# `u`,`v`,`w` (all in units of meter), `frequency` (MHz), `nominal_pixelsize` (arcsec)
+# script to extra data and relevant information in .mat file
 # Author: A. Dabbech
-
 import os
 import sys
-import subprocess
 import argparse
 import numpy as np
 import scipy.io as sio
-import matplotlib.pyplot as plt
 import math
 from casacore import tables
 
@@ -16,8 +12,8 @@ from casacore import tables
 c = 299792458
 
 # set dirs
-mydir = os.getcwd()
-data_dir = mydir + "/data/"
+
+data_dir = "../data"
 os.system("mkdir -p %s" % data_dir)
 
 

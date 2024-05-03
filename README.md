@@ -75,7 +75,7 @@ The current code takes as input data a measurement file in ``.mat`` format conta
 - **Notes:**
   - An example measurement file ``data_3c353.mat`` is provided in the folder [`$R2D2/data/3c353/`](data/3c353/).
   - Briggs weights are generated using the [WSClean software](https://wsclean.readthedocs.io/en/latest/) with the Briggs parameter set to `0`.
-  - To extract the data file from Measurement Set Tables (MS), you can use the utility Python script [`$R2D2/ms2mat/ms2mat.py`](ms2mat/ms2mat.py). Full instructions are available in [`$R2D2/ms2mat/ReadMe`](ms2mat/ReadMe.md).
+  - To extract the data file from Measurement Set Tables (MS), you can use the utility Python script [`$R2D2/ms2mat/ms2mat.py`](ms2mat/ms2mat.py). Full instructions are available in [`$R2D2/ms2mat/ReadMe`](ms2mat/README.md).
 
 #### Groundtruth file
 The groundtruth file `$GT_FILE` is in `.fits` format. The file is optional and is used to compute the reconstruction evaluation metrics. An example file `3c353_GTfits.fits` is provided in the folder [`$R2D2/data/3c353/`](data/3c353/).

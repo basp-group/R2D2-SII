@@ -13,7 +13,7 @@ c = 299792458
 
 # set dirs
 mydir = os.getcwd()
-data_dir = mydir + "/data/"
+data_dir = "../data/"
 os.system("mkdir -p %s" % data_dir)
 
 

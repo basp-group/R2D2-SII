@@ -12,8 +12,8 @@ from casacore import tables
 c = 299792458
 
 # set dirs
-
-data_dir = "../data"
+mydir = os.getcwd()
+data_dir = mydir + "/data/"
 os.system("mkdir -p %s" % data_dir)
 
 
@@ -132,7 +132,7 @@ def main():
     ## save data
     datamatfile = "%s/%s_data_ch_%s.mat" % (data_dir, srcname, freqid + 1)
     print("INFO: Saving data ..Freq %s" % freqid)
-    print("INFO: Data .mat file will be saved as:  %s" % datamatfile)
+
 
     sio.savemat(
         datamatfile,
@@ -147,6 +147,8 @@ def main():
             "maxProjBaseline": maxProjBaseline,  # max projected baseline  (in units of the wavelength)
         },
     )
+    print("INFO: Data .mat file saved:  %s" % datamatfile)
+    print("DONE.")
 
 
 if __name__ == "__main__":

@@ -39,7 +39,7 @@ fprintf('\nINFO: Results will be saved in: %s. ', srcResultPath)
 %% setting general parameters
 % general flags
 if ~isfield(param_general, 'flag_data_weighting')
-    param_general.flagDataWeighting = false;
+    param_general.flag_data_weighting = false;
 end
 flag_data_weighting = param_general.flag_data_weighting;
 %
@@ -84,17 +84,17 @@ end
 [A, At, G, W, nWimag] = util_gen_meas_op_comp_single(pathData, [imDimy, imDimx], param_nufft, param_wproj, param_weight);
 
 %------------------------------------------------------------------%
-
 %% operators
 MeasOp = @(x) forward_operator(x, G, W, A); % measurement op.
 adjointMeasOp = @(y) adjoint_operator(y, G, W, At); % adjoint of the measurement op.
+
 %------------------------------------------------------------------%
 tocmeas = toc(ticmeas);
 if verbose
     fprintf('\nINFO: Time to build the measurement operator: %f sec ', tocmeas);
 end
 
-%% PSF
+% PSF
 PSF = adjointMeasOp(MeasOp(full(sparse(floor(imDimy./2)+1, floor(imDimx./2)+1, 1, imDimy, imDimx))));
 max_PSF = max(PSF, [], 'all');
 if verbose, fprintf('\nINFO: PSF peak value: %g. ', max_PSF);
@@ -103,7 +103,6 @@ psfFile = fullfile(srcResultPath, 'psf.fits');
 fitswrite(PSF./max_PSF, psfFile); % for info only
 
 %------------------------------------------------------------------%
-
 %% DATA
 % Load data
 DATA = util_read_data_file(pathData);
@@ -118,7 +117,7 @@ end
 fprintf("\n____________________________________________________")
 
 %% R2D2 imaging
-%
+
 dnnSeries = param_general.dnnSeries;
 if strcmp(dnnSeries, "R3D3")
     fprintf("\nCompute PSF over twice the FoV for data fidelity layers in R2D2Net ..")
@@ -130,10 +129,11 @@ if strcmp(dnnSeries, "R3D3")
     [param_nufft_tmp, param_wproj_tmp] = util_set_param_operator(param_general, [imDimx_2FoV, imDimy_2FoV], imPixelSize);
 
     % Generate linear operators involved in the meas. operator
-    param_weight.weight_gridsize = 1/r3d3_oversampling;
+    param_weight_tmp = param_weight;
+    param_weight_tmp.weight_gridsize = 1/r3d3_oversampling;
 
     [A_tmp, At_tmp, G_tmp, W_tmp, ~] = util_gen_meas_op_comp_single(pathData, [imDimx_2FoV, imDimy_2FoV], ... .
-        param_nufft_tmp, param_wproj_tmp, param_weight);
+        param_nufft_tmp, param_wproj_tmp, param_weight_tmp);
 
     % operators
     MeasOp_tmp = @(x) forward_operator(x, G_tmp, W_tmp, A_tmp); % measurement op.

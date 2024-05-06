@@ -20,13 +20,13 @@ To clone the project, you may consider one of the following set of instructions.
 
 - Cloning the project using `https`
 ```bash
-git clone -b matlab https://github.com/basp-group/R2D2-RI.git
+git clone -b matlab-inference https://github.com/basp-group/R2D2-SII.git
 ```
 - Cloning the project using SSH key for GitHub
 ```bash
-git clone -b matlab git@github.com:basp-group/R2D2-RI.git
+git clone -b matlab-inference git@github.com:basp-group/R2D2-SII.git
 ```
-The full path to this repository is referred to as `$R2D2` in the rest of the documentation.
+The full path to this repository is referred to as `$R2D2-SII` in the rest of the documentation.
 
 ### MATLAB Dependencies
 To build the radio-interferometric measurement operator, the repository relies on the submodule
@@ -38,10 +38,10 @@ To build the radio-interferometric measurement operator, the repository relies o
 > 
 > [5] Dabbech, A., Wolz, L., Pratley, L., McEwen, J. D., & Wiaux, Y. (2017). The w-effect in interferometric imaging: from a fast sparse measurement operator to superresolution, *MNRAS*, 471(4), 4300-4313.
       
-Clone the submodule in [`$R2D2/lib/`](lib) using the command below:
+Clone the submodule in [`$R2D2-SII/lib/`](lib) using the command below:
 
 ```bash
-cd $R2D2/lib/
+cd $R2D2-SII/lib/
 git clone  https://github.com/basp-group/RI-measurement-operator.git
 ```
 ## Input files
@@ -83,12 +83,12 @@ The input data file `$DATA_FILE` is expected to be in `.mat` format, with the fo
    "maxProjBaseline" %% scalar; maximum projected baseline (in units of the wavelength; formally max(sqrt(u.^2+v.^2)))
    ```
 - **Notes:**
-  - An example measurement file ``data_3c353.mat`` is provided in the folder [`$R2D2/data/3c353/`](data/3c353/).
+  - An example measurement file ``data_3c353.mat`` is provided in the folder [`$R2D2-SII/data/3c353/`](data/3c353/).
   - Briggs weights are generated using the [WSClean software](https://wsclean.readthedocs.io/en/latest/) with the Briggs parameter set to `0`.
-  - To extract the data file from Measurement Set Tables (MS), you can use the utility Python script [`$R2D2/ms2mat/ms2mat.py`](ms2mat/ms2mat.py). Full instructions are available in [`$R2D2/ms2mat/ReadMe`](ms2mat/README.md).
+  - To extract the data file from Measurement Set Tables (MS), you can use the utility Python script [`$R2D2-SII/ms2mat/ms2mat.py`](ms2mat/ms2mat.py). Full instructions are available in [`$R2D2-SII/ms2mat/ReadMe`](ms2mat/README.md).
     
 ### Groundtruth file (optional)
-The groundtruth file `$GT_FILE` is in `.fits` format. The file is optional and is used to compute the reconstruction evaluation metrics. An example file `3c353_GTfits.fits` is provided in the folder [`$R2D2/data/3c353/`](data/3c353/).
+The groundtruth file `$GT_FILE` is in `.fits` format. The file is optional and is used to compute the reconstruction evaluation metrics. An example file `3c353_GTfits.fits` is provided in the folder [`$R2D2-SII/data/3c353/`](data/3c353/).
 
 ## Imaging with the R2D2 algorithm
 The R2D2 algorithm (R2D2/R3D3) is run in MATLAB. Input parameters are specified in the configuration file `$JSON_FILE` which is in  `.json` format, structured as follows:
@@ -99,8 +99,8 @@ The R2D2 algorithm (R2D2/R3D3) is run in MATLAB. Input parameters are specified 
             "imDimy"             %% scalar; image height.
             "dataFile"           %% string; path to the input data file (.mat).
             "srcName"            %% (optional) string; target source name.
-            "projectDir"         %% (optional) string; project directory $R2D2. Default: "./".
-            "resultPath"         %% (optional) string; results path. Default: $R2D2"/results".           
+            "projectDir"         %% (optional) string; project directory $R2D2-SII. Default: "./".
+            "resultPath"         %% (optional) string; results path. Default: $R2D2-SII"/results".           
             "verbose"            %% (optional) logical; Default: true.
             "flagSaveAllOutputs" %% (optional) logical; save files output of all iterations. Default: true.
 
@@ -127,5 +127,5 @@ To run the R2D2 algorithm run the command below in MATLAB:
     run_imager(`$JSON_FILE`);
 ```
 
-Examples of the configuration files are in [`$R2D2/config`](config).
+Examples of the configuration files are in [`$R2D2-SII/config`](config).
 

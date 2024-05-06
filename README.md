@@ -16,13 +16,7 @@ This repository provides a MATLAB implementation of the R2D2 algorithm.
 ## Installation
 
 ### Cloning the project
-To clone the project, you may consider one of the following set of instructions.
-
-- Cloning the project using `https`
-```bash
-git clone -b matlab-inference https://github.com/basp-group/R2D2-SII.git
-```
-- Cloning the project using SSH key for GitHub
+To clone the project using SSH key for GitHub run:
 ```bash
 git clone -b matlab-inference git@github.com:basp-group/R2D2-SII.git
 ```
@@ -42,7 +36,7 @@ Clone the submodule in [`$R2D2-SII/lib/`](lib) using the command below:
 
 ```bash
 cd $R2D2-SII/lib/
-git clone  https://github.com/basp-group/RI-measurement-operator.git
+git clone  git@github.com:basp-group/RI-measurement-operator.git
 ```
 ## Input files
 Both R2D2 and R3D3 series are trained to form images of size `512x512` from data acquired by the Very Large Array (VLA). The input dirty images (i.e., the back-projected data) are expected to have a pixel size corresponding to a super resolution factor of `1.5`, and to be obtained using the data-weighting scheme Briggs. To run the R2D2 algorithm, data and DNN files are required. To run the R2D2 algorithm, data and DNN files are required.

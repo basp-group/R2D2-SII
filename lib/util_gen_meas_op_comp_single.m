@@ -80,8 +80,12 @@ if flag_gen_weights
 end, clear nW2;
 
 % inject weights in G
-G = (nWimag .* double(nW)) .* G;
-clear nW;
+nW = nWimag .* nW;
+if ~isscalar(nW)
+    G = spdiags(nW,0,numel(nW),numel(nW)) * G;
+else,  G = nW.*G;
+end
+clear nW ;
 
 %% apply w-correction via w-projection
 if param_wproj.measop_flag_wproj && ~isempty(w) && nnz(w)

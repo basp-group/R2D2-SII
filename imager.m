@@ -8,9 +8,8 @@ end
 
 %% compute resources
 if isfield(param_general, 'nCpus') && ~isempty(param_general.nCpus)
-    nCpuAvail = maxNumCompThreads;
     nCpuRequested = maxNumCompThreads(param_general.nCpus);
-    fprintf("\nINFO: Available CPUs: %d.\nINFO: Requested CPUs: %d", nCpuAvail, maxNumCompThreads)
+    fprintf("\nINFO: Available CPUs: %d.\nINFO: Requested CPUs: %d", nCpuRequested, maxNumCompThreads)
 end
 %------------------------------------------------------------------
 
@@ -19,7 +18,7 @@ end
 projectDir = param_general.projectDir;
 fprintf('\nINFO: Main project dir. is: %s', projectDir);
 % matlab lib codes
-addpath([projectDir, filesep, 'lib', filesep, 'lib_utils', filesep]);
+addpath([projectDir, filesep, 'lib', filesep]);
 addpath([projectDir, filesep, 'lib', filesep, 'RI-measurement-operator', filesep, 'nufft']);
 addpath([projectDir, filesep, 'lib', filesep, 'RI-measurement-operator', filesep, 'lib', filesep, 'utils']);
 addpath([projectDir, filesep, 'lib', filesep, 'RI-measurement-operator', filesep, 'lib', filesep, 'operators']);
@@ -41,7 +40,6 @@ fprintf('\nINFO: Results will be saved in: %s. ', srcResultPath)
 if ~isfield(param_general, 'flag_data_weighting')
     param_general.flag_data_weighting = false;
 end
-flag_data_weighting = param_general.flag_data_weighting;
 %
 if ~isfield(param_general, 'flagSaveAllOutputs')
     param_general.flagSaveAllOutputs = false;
@@ -84,6 +82,7 @@ end
 [A, At, G, W, nWimag] = util_gen_meas_op_comp_single(pathData, [imDimy, imDimx], param_nufft, param_wproj, param_weight);
 
 %------------------------------------------------------------------%
+
 %% operators
 MeasOp = @(x) forward_operator(x, G, W, A); % measurement op.
 adjointMeasOp = @(y) adjoint_operator(y, G, W, At); % adjoint of the measurement op.
@@ -103,6 +102,7 @@ psfFile = fullfile(srcResultPath, 'psf.fits');
 fitswrite(PSF./max_PSF, psfFile); % for info only
 
 %------------------------------------------------------------------%
+
 %% DATA
 % Load data
 DATA = util_read_data_file(pathData);
@@ -130,7 +130,7 @@ if strcmp(dnnSeries, "R3D3")
 
     % Generate linear operators involved in the meas. operator
     param_weight_tmp = param_weight;
-    param_weight_tmp.weight_gridsize = 1/r3d3_oversampling;
+    param_weight_tmp.weight_gridsize = 1 / r3d3_oversampling;
 
     [A_tmp, At_tmp, G_tmp, W_tmp, ~] = util_gen_meas_op_comp_single(pathData, [imDimx_2FoV, imDimy_2FoV], ... .
         param_nufft_tmp, param_wproj_tmp, param_weight_tmp);

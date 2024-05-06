@@ -56,8 +56,8 @@ end
 %% algorithm
 param_solver = cell2struct(struct2cell(config{3, 1}.r2d2), fieldnames(config{3, 1}.r2d2));
 % check dnn folder
-% if ~isfolder(param_solver.ckptPath), error('CRITICAL: DNNs directory  not found.');
-% end
+if ~isfolder(param_solver.ckptPath), error('CRITICAL: DNNs directory  not found.');
+end
 % check gpu device
 if (~isfield(param_solver, 'dnnGPU') || isempty(param_solver.dnnGPU))
     param_solver.dnnGPU = (gpuDeviceCount("available") > 0);
@@ -101,8 +101,8 @@ imDimx = main.imDimx;
 imDimy = main.imDimy;
 dataFile = main.dataFile;
 % check data file
-%if ~isfile(dataFile), error('CRITICAL: data file not found.');
-%end
+if ~isfile(dataFile), error('CRITICAL: data file not found.');
+end
 % run imager
 imager(dataFile, imDimx, imDimy, param_general, param_groundtruth);
 fprintf('\nTHE END. \n')

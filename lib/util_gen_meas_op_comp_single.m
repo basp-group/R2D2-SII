@@ -41,7 +41,7 @@ load(dataFilename, 'u', 'v', 'w', 'nW');
 u = double(u(:)) * pi / double(param_wproj.halfSpatialBandwidth);
 v = -double(v(:)) * pi / double(param_wproj.halfSpatialBandwidth);
 w = -double(w(:)); % !!  -1 to w coordinate
-
+nW = double(nW(:));
 %% nufft operators
 % compute dimensions
 J = [param_nufft.Ky, param_nufft.Kx]; %  Dim. of the interpolation kernel

@@ -8,7 +8,7 @@ Please refer to the following papers:
 
 >[1] Aghabiglou, A., Chu, C. S., Dabbech, A. & Wiaux, Y., [The R2D2 deep neural network series paradigm for fast precision imaging in radio astronomy](https://arxiv.org/abs/2403.05452), accepted for publication in ApJS, 2024, *preprint arXiv:2403.05452*.
 >
->[2] Dabbech, A., Aghabiglou, A., Chu, C. S. & Wiaux, Y., [CLEANing Cygnus A deep and fast with R2D2](https://arxiv.org/abs/2309.03291), accepted for publication in ApJL, 2024, *preprint arXiv:2309.03291*.
+>[2] Dabbech, A., Aghabiglou, A., Chu, C. S. & Wiaux, Y., [CLEANing Cygnus A deep and fast with R2D2](https://iopscience.iop.org/article/10.3847/2041-8213/ad41df), ApJL, (966) L34, 2024, *preprint arXiv:2309.03291*.
 >
 
 This repository provides a MATLAB implementation of the R2D2 algorithm.
@@ -39,7 +39,7 @@ cd $R2D2-SII/lib/
 git clone  git@github.com:basp-group/RI-measurement-operator.git
 ```
 ## Input files
-Both R2D2 and R3D3 series are trained to form images of size `512x512` from data acquired by the Very Large Array (VLA). The input dirty images (i.e., the back-projected data) are expected to have a pixel size corresponding to a super resolution factor of `1.5`, and to be obtained using the data-weighting scheme Briggs. To run the R2D2 algorithm, data and DNN files are required. To run the R2D2 algorithm, data and DNN files are required.
+The available R2D2 and R3D3 series are trained to form images of size **`512x512`** from data acquired by the **Very Large Array** (VLA). The input dirty images (i.e., the back-projected data) are expected to have a pixel size corresponding to a **super resolution factor of `1.5`**, and to be obtained using the data-weighting scheme **Briggs (robust parameter `0`**). To run the R2D2 algorithm, data and DNN files are required. 
 
 ### Trained DNN series
 The VLA-trained R2D2 and R3D3 DNN series are available at the DOI:[10.17861/99cbe654-5071-4625-b59d-a26c790cbeb4](https://researchportal.hw.ac.uk/en/datasets/r2d2-deep-neural-network-series-for-radio-interferometric-imaging). DNN files must be saved in a desired path `$ONNX_DIR`, under the following filename convention.
@@ -78,7 +78,7 @@ The input data file `$DATA_FILE` is expected to be in `.mat` format, with the fo
    ```
 - **Notes:**
   - An example measurement file ``data_3c353.mat`` is provided in the folder [`$R2D2-SII/data/3c353/`](data/3c353/).
-  - Briggs weights are generated using the [WSClean software](https://wsclean.readthedocs.io/en/latest/) with the Briggs parameter set to `0`.
+  - **The code offers the capability to compute imaging weights (Briggs and uniform)**. Alternatively, the weights can be read from the data file if computed with the [WSClean software](https://wsclean.readthedocs.io/en/latest/). 
   - To extract the data file from Measurement Set Tables (MS), you can use the utility Python script [`$R2D2-SII/ms2mat/ms2mat.py`](ms2mat/ms2mat.py). Full instructions are available in [`$R2D2-SII/ms2mat/ReadMe`](ms2mat/README.md).
     
 ### Groundtruth file (optional)
@@ -101,8 +101,13 @@ The R2D2 algorithm (R2D2/R3D3) is run in MATLAB. Input parameters are specified 
      ``measurement operator``
             "imPixelSize"          %% scalar; pixel size in arcsec. If not defined, "nufftSuperresolution" is used.
             "nufftSuperresolution" %% scalar; super-resolution factor (>= 1), used when the pixel size is not defined. Default: 1.
-            "flagDataWeighting "   %% (optional) logical; flag to indicate if imaging weights are available (Briggs or uniform). Default: false.
+            "flag_data_weighting"  %% (optional) logical; flag to indicate if imaging weights are available (Briggs or uniform). Default: false.
+            "weight_type"          %% (optional) string; type of imaging weights are available (`briggs`, `uniform`). Default: None.
+            "weight_robustness"    %% (optional) scalar; robustness parameter of Briggs weighting, to be set in [-2, 2]. Default: 0.
+            "weight_gridsize"      %% (optional) scalar; padding parameter to compute the density of the sampling. Default: 2.
+            "weight_load"          %% (optional) logical; flag to indicate if imaging weights are available in the data file. Default: false.
             "nCpus"                %% (optional) scalar; number of cpu cores used in MATLAB.
+
 
      ``algorithm``
             "dnnSeries"          %% string; incarnation of the R2D2 algorithm: "R2D2" or "R3D3".

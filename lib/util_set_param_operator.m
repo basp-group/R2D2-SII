@@ -76,7 +76,7 @@ else
     param_weight.weight_type = param_general.weight_type;
 end
 
-if strcmp(param_weight.weight_type, 'robust')
+if strcmp(param_weight.weight_type, 'briggs')
     if ~isfield(param_general, 'weight_robustness') || isempty(param_general.weight_robustness)
         param_weight.weight_robustness = 0;
     else

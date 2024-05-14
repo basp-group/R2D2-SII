@@ -62,9 +62,6 @@ nWimag = 1; % init
 % data weights for imaging
 flag_gen_weights = ~(param_weight.weight_load) || ~(param_weight.flag_data_weighting);
 
-try load(dataFilename, 'nWimag');
-    nWimagws = double(nWimag(:));
-end
 if param_weight.flag_data_weighting && param_weight.weight_load
     try load(dataFilename, 'nWimag');
         nWimag = double(nWimag(:));
@@ -73,14 +70,14 @@ if param_weight.flag_data_weighting && param_weight.weight_load
         flag_gen_weights = true;
     end
 end
+
 if flag_gen_weights
     fprintf("\ngenerating imaging weights .. ")
-    nWimag = util_gen_imaging_weights(u, v, double(nW), N, param_weight);
-    norm(nWimag-nWimagws) / norm(nWimagws)
+    nWimag = util_gen_imaging_weights(u, v, nW, N, param_weight);
 end
+
 % inject weights in G
-try
-    G = (nWimag .* nW) .* G;
+try G = (nWimag .* nW) .* G;
 catch
     G = sparse(1:nmeas, 1:nmeas, (nWimag .* nW), nmeas, nmeas) * G;
 end

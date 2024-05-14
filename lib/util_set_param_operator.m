@@ -85,7 +85,7 @@ if strcmp(param_weight.weight_type, 'robust')
 end
 
 if ~isfield(param_general, 'weight_gridsize') || isempty(param_general.weight_gridsize)
-    param_weight.weight_gridsize = 1;
+    param_weight.weight_gridsize = max(param_nufft.oy, param_nufft.ox);
 else
     param_weight.weight_gridsize = param_general.weight_gridsize;
 end
@@ -99,7 +99,7 @@ else
 end
 
 if ~isfield(param_general, 'precond_weight_gridsize') || isempty(param_general.precond_weight_gridsize)
-    param_precond.weight_gridsize = 2;
+    param_precond.weight_gridsize = max(param_nufft.oy, param_nufft.ox);
 else
     param_precond.weight_gridsize = param_general.precond_weight_gridsize;
 end

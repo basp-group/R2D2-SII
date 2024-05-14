@@ -43,6 +43,7 @@ v = -double(v(:)) * pi / double(param_wproj.halfSpatialBandwidth);
 w = -double(w(:)); % !!  -1 to w coordinate
 nW = double(nW(:));
 nmeas = numel(u);
+
 %% nufft operators
 % compute dimensions
 J = [param_nufft.Ky, param_nufft.Kx]; %  Dim. of the interpolation kernel
@@ -61,6 +62,9 @@ nWimag = 1; % init
 % data weights for imaging
 flag_gen_weights = ~(param_weight.weight_load) || ~(param_weight.flag_data_weighting);
 
+try load(dataFilename, 'nWimag');
+    nWimagws = double(nWimag(:));
+end
 if param_weight.flag_data_weighting && param_weight.weight_load
     try load(dataFilename, 'nWimag');
         nWimag = double(nWimag(:));
@@ -69,19 +73,13 @@ if param_weight.flag_data_weighting && param_weight.weight_load
         flag_gen_weights = true;
     end
 end
-
 if flag_gen_weights
-    if isscalar(nW)
-        nW2 = double(nW^2) .* ones(nmeas,1);
-    else
-        nW2 = double(nW).^2;
-    end
     fprintf("\ngenerating imaging weights .. ")
-    nWimag = util_gen_imaging_weights(u, v, nW2, N, param_weight);
-end, clear nW2;
-
+    nWimag = util_gen_imaging_weights(u, v, double(nW), N, param_weight);
+    norm(nWimag-nWimagws) / norm(nWimagws)
+end
 % inject weights in G
-try  
+try
     G = (nWimag .* nW) .* G;
 catch
     G = sparse(1:nmeas, 1:nmeas, (nWimag .* nW), nmeas, nmeas) * G;
@@ -103,7 +101,7 @@ W = (abs(sum(G, 1).') > 0);
 G = G(:, W);
 
 %% compute uniform weights (sampling density) for  preconditioning
-if exist('param_precond','var')
+if exist('param_precond', 'var')
     Wprecond = util_gen_imaging_weights(u, v, [], N, param_precond).^2;
 else
     Wprecond = [];

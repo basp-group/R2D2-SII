@@ -130,7 +130,7 @@ if strcmp(dnnSeries, "R3D3")
 
     % Generate linear operators involved in the meas. operator
     param_weight_tmp = param_weight;
-    param_weight_tmp.weight_gridsize = 1 / r3d3_oversampling;
+    param_weight_tmp.weight_gridsize = param_weight_tmp.weight_gridsize / r3d3_oversampling;
 
     [A_tmp, At_tmp, G_tmp, W_tmp, ~] = util_gen_meas_op_comp_single(pathData, [imDimx_2FoV, imDimy_2FoV], ... .
         param_nufft_tmp, param_wproj_tmp, param_weight_tmp);

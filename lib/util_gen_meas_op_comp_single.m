@@ -60,7 +60,7 @@ At = @(x) so_fft2_adj(x, N, K, scale);
 %% inject weights in `G`
 nWimag = 1; % init
 % data weights for imaging
-flag_gen_weights = (~(param_weight.flag_data_weighting))|| (~(param_weight.weight_load) && (param_weight.flag_data_weighting));
+flag_gen_weights = (~(param_weight.weight_load) && (param_weight.flag_data_weighting));
 
 if param_weight.flag_data_weighting && param_weight.weight_load
     try load(dataFilename, 'nWimag');

@@ -4,11 +4,12 @@ from lightning import Trainer
 from scipy.io import loadmat
 import torch
 import glob
+import os
 
 def create_trainer(args):
     load_version = 0 if args.resume else None
     if args.mode == 'train':
-        mat_path_files = glob.glob(f'{args.data_path}/{args.scname_val}{args.mat_ext}/*.mat')
+        mat_path_files = glob.glob(os.path.join(args.data_path, args.scname_val, args.mat_ext, '*.mat'))
         if len(mat_path_files) > 0 and ('a_expo' in loadmat(mat_path_files[0]) or 'expo_factor' in loadmat(mat_path_files[0])):
             monitor = "val_logSNR_epoch"
             filename = "{epoch:02d}-{val_logSNR_epoch:.2f}"

@@ -3,8 +3,10 @@ from model.network.unet_model import UnetModel
 import torch
 import glob
 import gc
+import os
+import pathlib
 
-def get_DNNs(args, device=None):
+def get_DNNs(num_iter: int, ckpt_path: pathlib.Path, device=None):
     """Check if all DNNs are available in the specified path and return a dictionary containing the paths to all DNNs.
 
     Parameters
@@ -23,28 +25,28 @@ def get_DNNs(args, device=None):
         If checkpoint for any iteration is not found or if there is a conflict in checkpoint files.
     """
     if device == None:
-        device = args.device
+        device = device
     dnns_dict = {}
-    for i in range(args.num_iter):
-        dnn = glob.glob(f'{args.ckpt_path}/*N{i+1}.ckpt')
+    for i in range(num_iter):
+        dnn = glob.glob(os.path.join(ckpt_path, f'*N{i+1}.ckpt'))
         if len(dnn) == 0:
             raise ValueError(f'Checkpoint for N{i+1} not found')
         elif len(dnn) >1:
             raise ValueError(f'Checkpoint conflict for N{i+1}')
-        dnns_dict[f'N{i+1}'] = torch.load(dnn[0], map_location=device)['state_dict']
-        # dnns_dict[f'N{i+1}'] = torch.load(dnn[0], map_location=torch.device('cpu'))['state_dict']
+        model_loaded = torch.load(dnn[0], map_location=torch.device('cpu'))
+        dnns_dict[f'N{i+1}'] = model_loaded['state_dict']
     print('All DNNs found.')
     return dnns_dict
 
 def load_net(net, N, args, dnn_dict):
     state_dict = dnn_dict[f'N{N}']#.to(args.device)
     if args.layers == 1:
-        net_tmp = {f.split(f'unet.')[1]: state_dict[f] for f in state_dict if f.startswith(f'unet')}
+        net_tmp = {f.split(f'unet.')[1]: state_dict[f] for f in state_dict if f.startswith(f'unet.')}
         net.load_state_dict(net_tmp)
         del state_dict, net_tmp
     elif args.layers > 1:
         for i in range(args.layers):
-            net_tmp = {f.split(f'unet{i+1}.')[1]: state_dict[f] for f in state_dict if f.startswith(f'unet{i+1}')}
+            net_tmp = {f.split(f'unet{i+1}.')[1]: state_dict[f] for f in state_dict if f.startswith(f'unet{i+1}.')}
             net[i].load_state_dict(net_tmp)
             del net_tmp
         del state_dict
@@ -78,7 +80,7 @@ def create_net(args, device):
                          num_pool_layers=args.num_pools,
                          drop_prob=0.).to(device)
         if load_dict:
-            net_tmp = {f.split(f'unet.')[1]: state_dict[f] for f in state_dict if f.startswith(f'unet')}
+            net_tmp = {f.split(f'unet.')[1]: state_dict[f] for f in state_dict if f.startswith(f'unet.')}
             unet.load_state_dict(net_tmp)
     elif args.layers > 1:
         unets = []
@@ -89,7 +91,7 @@ def create_net(args, device):
                             num_pool_layers=args.num_pools,
                             drop_prob=0.).to(device)
             if load_dict:
-                net_tmp = {f.split(f'unet{i+1}.')[1]: state_dict[f] for f in state_dict if f.startswith(f'unet{i+1}')}
+                net_tmp = {f.split(f'unet{i+1}.')[1]: state_dict[f] for f in state_dict if f.startswith(f'unet{i+1}.')}
                 unet.load_state_dict(net_tmp)
 
             unets.append(unet)

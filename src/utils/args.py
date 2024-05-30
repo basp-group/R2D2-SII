@@ -1,105 +1,215 @@
+#!/usr/bin/env python3
+# Author: Taylor C.
+"""
+Functions to parse the configuration file in .yaml format, and validate all
+arguments set from the configuration file using Pydantic model.
+"""
+
+###################################################
+# imports
+
 import os
 import argparse
 import pathlib
+import yaml
+from enum import Enum, IntEnum
+from pydantic import BaseModel, ConfigDict, FilePath, DirectoryPath, ValidationError, field_validator
+from typing import List, Optional, Union
 
-# Inference related argparse functions
+###################################################
 
-def prep_args_inference(args):
-    """Read and process all required and optional arguments from command line.
-
-    Parameters
-    ----------
-    args : _ArgumentParser
-        Arguments parsed from command line.
-
-    Returns
-    -------
-    _ArgumentParser
-        Arguments parsed from command line and processed.
+def parse_yaml_file():
     """
-    assert args.data_file.endswith('.mat') or args.data_file.endswith('.fits'), 'The provided data_file format is not currently supported. (only .fits or .mat are supported)'
-    args.fname = args.data_file.split('/')[-1].split('.mat')[0].split('.fits')[0]
-    args.total_num_iter = args.num_iter
-    args.save_output = args.save_all_outputs
-    args.mode = 'test_single'
-    args.compute_metrics = False if args.gdth_file is None else True
-    args.resume = False
-    args.positivity = True
-    if args.series == 'R2D2':
-        args.layers = 1
-    elif args.series == 'R3D3':
-        assert args.layers > 1, 'R3D3 series must have more than 1 layer.'
-    if not os.path.exists(args.output_path):
-        os.makedirs(args.output_path)
-    if args.gdth_file is None:
-        print('INFO: No ground truth provided, SNR and logSNR will not be computed.')
-    elif args.gdth_file is not None and args.target_dynamic_range == 0.:
-        print('INFO: Ground truth provided but no target dynamic range specified, only SNR will be computed.')
-    elif args.gdth_file is not None and args.target_dynamic_range > 0.:
-        print('INFO: Ground truth provided and target dynamic range specified, SNR and logSNR will be computed.')
+    Parse a YAML file containing configuration arguments and return the parsed arguments.
+
+    :return: parsed argument with yaml file path.
+    :rtype: argparse.Namespace
+    """    
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--yaml_file', type=str, required=True,
+                    help='Path to yaml file containing all the arguments.')
+    parser.add_argument('--data_file', type=str, default=None)
+    parser.add_argument('--output_path', type=str, default=None)
+    parser.add_argument('--super_resolution', type=float, default=None)
+    parser.add_argument('--ckpt_path', type=str, default=None)
+    parser.add_argument('--gdth_file', type=str, default=None)
+    parser.add_argument('--series', type=SeriesEnum, default=SeriesEnum.R2D2)
+    parser.add_argument('--layers', type=LayersEnum, default=LayersEnum.one)
+    parser.add_argument('--num_iter', type=int, default=15)
+    args = parser.parse_args()
     return args
 
-def parse_args_inference():
-    """Parse all required and optional arguments from command line.
+###################################################
 
-    Returns
-    -------
-    _ArgumentParser
-        Arguments parsed from command line.
+class SeriesEnum(str, Enum):
     """
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--num_iter', type=int, required=True, 
-                        help='Number of iterations in the R2D2/ R3D3 series, \
-                            one checkpoint file required in ckpt_path for each iteration.')
-    parser.add_argument('--series', choices=['R2D2', 'R3D3'], required=True,
-                        help='Choose between R2D2 and R3D3 series.')
-    parser.add_argument('--layers', type=int, default=1, 
-                        help='Number of layers in R2D2Net for R3D3 series, default to 6.')
-    parser.add_argument('--ckpt_path', type=str, required=True, 
-                        help='Path to checkpoint files.')
-    parser.add_argument('--data_file', type=str, required=True,
-                        help='Path to file containing uv coordinates, visibility data and weighting.')
-    parser.add_argument('--im_dim_x', type=int, required=True,
-                        help='Image dimension in x direction.')
-    parser.add_argument('--im_dim_y', type=int, required=True,
-                        help='Image dimension in y direction.')
-    parser.add_argument('--output_path', type=str, required=True,
-                        help='Path to save the output.')
-    parser.add_argument('--super_resolution', type=float, required=True,
-                        help='Super-resolution factor.')
+    Enum class for the series of R2D2 and R3D3.
+    """
+    R2D2 = 'R2D2'
+    R3D3 = 'R3D3'
     
-    parser.add_argument('--operator_type', choices=['table', 'sparse_matrix'], default='table',
-                        help='NUFFT for residual dirty image computation using either table interpolation or precomputed sparse matrix.')
-    parser.add_argument('--gdth_file', type=str, default=None,
-                        help='Path to gdth image corresponding to the dirty image, if available.')
-    parser.add_argument('--target_dynamic_range', type=float, default=0.,
-                        help='Dynamic range of the target image.')
-    parser.add_argument('--save_all_outputs', action='store_true',
-                        help='If True, reconstruction and residual dirty image in all \
-                        iterations will be saved, otherwise only those from the last \
-                        iteration will be saved.')
-    parser.add_argument('--res_on_gpu', action='store_true',
-                        help='If True, residual computation will be done on GPU.')
-    parser.add_argument('--imweight_name', type=str, default='nWimag', help='Name of variable containing imweight in the uv file. Default is nWimag.')
+
+class LayersEnum(IntEnum):
+    """
+    Enum class for the number of layers in the R2D2Net for the R3D3 series.
+    """
+    one = 1
+    three = 3
+    six = 6
     
-    parser.add_argument('--num_chans', type=int, default=64,
-                        help='Number of UNet channels')
-    parser.add_argument('--num_pools', type=int, default=4,
-                        help='Number of U-Net pooling layers')
-    parser.add_argument('--drop_prob', type=float, default=0.,
-                        help='Dropout probability')
+class OpTypeEnum(str, Enum):
+    """
+    Enum class for the type of measurement operator using TorchKbNufft.
+    """
+    table = 'table' # table interpolation, default, faster but less accurate
+    sparse_matrix = 'sparse_matrix' # precomputed sparse matrix, slower but more accurate
+
+class DataTypeEnum(str, Enum):
+    """
+    Enum class for the type of data to generate.
+    """
+    visibilities = 'visibilities'
+    residual = 'residual'
     
-    parser.add_argument('--uv_file', type=str, default=None,
-                        help='.mat file containing uv data.')
-    parser.add_argument('--cpus', type=int, default=1,
-                        help='Number of cpus to use')
-    parser.add_argument('--gpus', type=int, default=1,
-                        help='Number of gpus in each node')
-    parser.add_argument('--nodes', type=int, default=1, 
-                        help='Number of gpu nodes to be used')
-    parser.add_argument('--verbose', choices=[1, 0], default=1,
-                        help='Verbosity level, choose between 1 and 0.')
-    return parser.parse_args()
+class WeightTypeEnum(str, Enum):
+    """
+    Enum class for the type of weighting to generate.
+    """
+    briggs = 'briggs'
+    uniform = 'uniform'
+    none = 'none'
+    
+class WeightRobustnessEnum(str, Enum):
+    """
+    Enum class for the type of weighting to generate.
+    """
+    random = 'random'
+    zero = 'zero'
+    
+class CommonArgs(BaseModel):
+    """
+    Pydantic model class containing common arguments for different tasks.
+    """
+    model_config = ConfigDict()
+    
+    # algorithm 
+    num_iter: int
+    series: SeriesEnum = SeriesEnum.R2D2
+    layers: LayersEnum = LayersEnum.one
+    
+    # measurement operator
+    im_dim_x: int = 512
+    im_dim_y: int = 512
+    super_resolution: float = 1.5
+    operator_type: OpTypeEnum = OpTypeEnum.table
+    
+    # imaging weight
+    gen_nWimag: bool = False
+    natural_weight: bool = False
+    weight_type: WeightTypeEnum = WeightTypeEnum.briggs
+    weight_gridsize: float = 2
+    weight_robustness: WeightRobustnessEnum = WeightRobustnessEnum.zero
+    weight_robustness_min: float = -1.
+    weight_robustness_max: float = 1.
+    
+    # network architecture
+    num_chans: int = 64
+    num_pools: int = 4
+    drop_prob: float = 0.0
+    
+    # miscellaneous
+    verbose: int = 1
+    
+    # validation
+    @field_validator('layers')
+    @classmethod
+    def _check_layers(cls, v, values):
+        if values.data['series'] == SeriesEnum.R2D2:
+            if v != LayersEnum.one.value:
+                # raise ValueError('R2D2 series must have only one layer.')
+                print('WARNING: R2D2 series must have only one layer, this will be set automatically.')
+                v = LayersEnum.one
+        elif values.data['series'] == SeriesEnum.R3D3:
+            if v == LayersEnum.one.value:
+                raise ValueError('R3D3 series must have more than one layer, please change `layers` value in config file!')
+        return v
+    
+    @field_validator('series', 'layers', 'operator_type')
+    @classmethod
+    def _return_value(cls, v):
+        return v.value
+    
+###################################################
+
+class InferenceArgs(CommonArgs):
+    """
+    Pydantic model class containing arguments specific to R2D2 inference.
+    """
+    
+    # i/o
+    ckpt_path: DirectoryPath
+    data_file: FilePath
+    output_path: str = './results/'
+    gdth_file: Optional[FilePath] = None
+    imweight_name: str = 'nWimag'
+    save_all_outputs: bool = False
+    
+    # hardware
+    res_on_gpu: bool = True
+    cpus: int = 1
+    
+    # metrics
+    target_dynamic_range: float = 0.0
+    
+    # validation
+    @field_validator('data_file')
+    @classmethod
+    def _check_data_file(cls, v):
+        assert str(v).endswith('.mat') or str(v).endswith('.fits'), 'The provided data_file format is not currently supported. (only .fits or .mat are supported)'
+        return v
+    
+    @field_validator('save_all_outputs', mode='before')
+    @classmethod
+    def _check_save_all_outputs(cls, v):
+        if v is None:
+            return False
+        else:
+            return v
+    
+    @field_validator('target_dynamic_range', mode='before')
+    @classmethod
+    def _check_target_dynamic_range(cls, v):
+        if v is None:
+            return 0.0
+        else:
+            return v
+    
+def parse_args_inference():
+    """
+    Parses the arguments for inference from a YAML file and updates the argument object with additional parameters.
+
+    This function reads a YAML file specified by the `--yaml_file` argument, updates the argument object with the parameters
+    specified in the YAML file, and sets additional parameters for inference. It also performs some checks and prints
+    information messages.
+
+    :return: The updated argument object.
+    :rtype: argparse.Namespace
+
+    :raises AssertionError: If the `data_file` argument does not end with '.mat' or '.fits'.
+                             If the `series` argument is 'R3D3' and `layers` is not greater than 1.
+    """
+    args_yaml = parse_yaml_file()
+    with open(args_yaml.yaml_file, 'r') as file:
+        yaml_loaded = yaml.safe_load(file)
+        for k, v in yaml_loaded.items():
+            if k not in args_yaml.__dict__ or args_yaml.__dict__[k] is None:
+                args_yaml.__dict__.update({k: v})
+        # args_yaml.__dict__.update(yaml.safe_load(file))
+    args = InferenceArgs(**args_yaml.__dict__)
+    if not os.path.exists(args.output_path):
+        os.makedirs(args.output_path)
+    return args
 
 # Pytorch lightning (training/ testing) related argparse functions
 
@@ -206,37 +316,102 @@ def parse_args_pl():
                         help='Save output')
     return parser.parse_args()
 
-def parse_args_data_gen():
-    main_parser = argparse.ArgumentParser()
+###################################################
 
-    subparsers = main_parser.add_subparsers(dest='data_type')
-    dirty_parser = subparsers.add_parser('dirty', help='Generate dirty images')
-    dirty_parser.add_argument('--gdth_path', type=str, required=True, help='Path to ground truth images.')
-    dirty_parser.add_argument('--output_path', type=str, required=True, help='Main path to save output images and data, subdirectories will be created.')
-    dirty_parser.add_argument('--uv_path', type=str, required=True, help='Path to uv data')
-    dirty_parser.add_argument('--dataset', choices=['training', 'validation', 'test'], required=True, help='Choose between training, validation and test dataset.')
-    dirty_parser.add_argument('--super_resolution', type=float, default=1., help='Super-resolution factor.')
-    dirty_parser.add_argument('--sigma_range', type=float, nargs='+', default=[2e-6,1e-3], help='Standard deviation for the noise to be added to measurement.')
-    dirty_parser.add_argument('--briggs', action='store_true', help='If True, briggs weighting will be applied.')
-    dirty_parser.add_argument('--expo', action='store_true', help='If True, ground truth will be exponentiated.')
-    dirty_parser.add_argument('--sigma0', type=float, default=0., help='1/ current dynamic range of the ground truth image.')
-    dirty_parser.add_argument('--imweight_name', type=str, default='nWimag', help='Name of variable containing imweight in the uv file. Default is nWimag. If multiple, separate by comma.')
-    dirty_parser.add_argument('--operator_type', choices=['table', 'sparse_matrix'], default='table',
-                              help='NUFFT for residual dirty image computation using either table interpolation or precomputed sparse matrix.')
-    dirty_parser.add_argument('--on_gpu', action='store_true', help='If True, dirty images will be computed on gpu.')
 
-    residual_parser = subparsers.add_parser('residual', help='Generate residual dirty images')
-    residual_parser.add_argument('--rec_path', type=str, help='Path to reconstructed images.')
-    residual_parser.add_argument('--dirty_path', type=str, help='Path to dirty images.')
-    residual_parser.add_argument('--prune', action='store_true', help='If True, dataset will be pruned according to the data-fidelity based procedure.')
-    residual_parser.add_argument('--epsilon_path', type=str, default=None, help='Path to .mat files containing the value of true noise norm for pruning.')
-    residual_parser.add_argument('--output_res_path', type=str, help='Path to save output residual dirty images.')
-    residual_parser.add_argument('--uv_path', type=str, help='Path to uv data')
-    residual_parser.add_argument('--super_resolution', type=float, default=1., help='Super-resolution factor.')
-    residual_parser.add_argument('--imweight_name', type=str, default='nWimag', help='Name of variable containing imweight in the uv file. Default is nWimag.')
-    residual_parser.add_argument('--operator_type', choices=['table', 'sparse_matrix'], default='table',
-                                 help='NUFFT for residual dirty image computation using either table interpolation or precomputed sparse matrix.')
-    residual_parser.add_argument('--on_gpu', action='store_true', help='If True, dirty images will be computed on gpu.')
+class DataCommonArgs(BaseModel):
+    """
+    Pydantic model class containing common arguments for different tasks.
+    """
+    model_config = ConfigDict()
     
-    args = main_parser.parse_args()
+    data_type: DataTypeEnum
+    seed: Union[int, str]
+    
+    # i/o
+    gdth_path: DirectoryPath
+    output_path: str
+    uv_path: DirectoryPath
+    
+    dataset: str = 'test'
+    save_vis: bool = False
+    save_PSF: bool = False
+    save_dirty: bool = False # option to save dirty images when generating visibilties
+    return_sub_op: bool = False
+    
+    # measurement operator
+    SR_from_filename: bool = False
+    operator_type: OpTypeEnum = OpTypeEnum.table
+    imweight_name: str = 'nWimag'
+    on_gpu: bool = False
+    briggs: bool = False
+    
+    # noise
+    sigma_range_min: float = 0.
+    sigma_range_max: float = 0.
+    multi_noise : bool = False
+    
+    # exponentiation
+    sigma0: float = 0.
+    expo: bool = False
+    
+    # miscellaneous
+    verbose: int = 1
+    uv_random: bool = False
+    
+    # validation
+    @field_validator('seed')
+    @classmethod
+    def _check_seed(cls, v):
+        if type(v) == int:
+            if v == 0:
+                print('WARNING: Seed value 0 is not recommended, this will be set to 1377.')
+                v = 1377
+            assert v > 0, 'Seed value must be positive.'
+        elif type(v) == 'str':
+            assert v == 'uv', 'Only string value `uv` is accepted for seed, which will use the uv_id in the filename of the uv file as seed.'
+        return v
+    
+    @field_validator('save_dirty')
+    @classmethod
+    def _check_layers(cls, v, values):
+        if values.data['data_type'] != DataTypeEnum.visibilities:
+            print('WARNING: `save_dirty` is only applicable for visibilities, this will be set to False.')
+            v = False
+        return v
+    
+    @field_validator('sigma_range_min', 'sigma_range_max')
+    @classmethod
+    def _check_sigma_range(cls, v):
+        if v <= 0:
+            raise ValueError('Sigma range must be non-negative and non-zero.')
+        return v
+    
+    @field_validator('sigma_range_max')
+    @classmethod
+    def _check_sigma_range_max(cls, v, values):
+        if v < values.data['sigma_range_min']:
+            raise ValueError('Sigma range min must be less than sigma range max.')
+        return v
+    
+    @field_validator('expo')
+    @classmethod
+    def _check_expo(cls, v, values):
+        if v:
+            assert values.data['sigma0'] > 0, 'Sigma0 must be positive for exponentiation.'
+            assert values.data['sigma0'] > values.data['sigma_range_max'], 'Sigma0 must be greater than sigma range max for exponentiation.'
+        return v
+    
+    @field_validator('data_type', 'operator_type')
+    @classmethod
+    def _return_value(cls, v):
+        return v.value
+
+###################################################
+
+def parse_args_data_gen():
+    args_yaml = parse_yaml_file()
+    with open(args_yaml.yaml_file, 'r') as file:
+        args_yaml.__dict__.update(yaml.safe_load(file))
+    args = DataCommonArgs(**args_yaml.__dict__)
     return args

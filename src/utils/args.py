@@ -13,7 +13,7 @@ import argparse
 import pathlib
 import yaml
 from enum import Enum, IntEnum
-from pydantic import BaseModel, ConfigDict, FilePath, DirectoryPath, ValidationError, field_validator
+from pydantic import BaseModel, ConfigDict, FilePath, DirectoryPath, field_validator
 from typing import List, Optional, Union
 
 ###################################################
@@ -94,7 +94,7 @@ class CommonArgs(BaseModel):
     model_config = ConfigDict()
     
     # algorithm 
-    num_iter: int
+    num_iter: Union[int, str]
     series: SeriesEnum = SeriesEnum.R2D2
     layers: LayersEnum = LayersEnum.one
     
@@ -121,7 +121,7 @@ class CommonArgs(BaseModel):
     # miscellaneous
     verbose: int = 1
     
-    # validation
+    # validation    
     @field_validator('layers')
     @classmethod
     def _check_layers(cls, v, values):
@@ -163,6 +163,12 @@ class InferenceArgs(CommonArgs):
     target_dynamic_range: float = 0.0
     
     # validation
+    @field_validator('gdth_file', mode='before')
+    @classmethod
+    def _check_empty(cls, v):
+        if type(v) == str and len(v) == 0:
+            return None
+    
     @field_validator('data_file')
     @classmethod
     def _check_data_file(cls, v):

@@ -36,7 +36,7 @@ def parse_yaml_file():
     parser.add_argument('--gdth_file', type=str, default=None)
     parser.add_argument('--series', type=SeriesEnum, default=SeriesEnum.R2D2)
     parser.add_argument('--layers', type=LayersEnum, default=LayersEnum.one)
-    parser.add_argument('--num_iter', type=int, default=15)
+    parser.add_argument('--num_iter', type=int, default=None)
     args = parser.parse_args()
     return args
 

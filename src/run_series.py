@@ -58,7 +58,7 @@ if __name__ == "__main__":
         time_PSF = timeit.default_timer()
         data['PSF'] = op.gen_PSF(oversampling=2, normalize=True)
         print(f'INFO: time to compute the PSF needed in R2D2-Net: {timeit.default_timer() - time_PSF:.6f} sec')
-        fits.writeto(os.path.join(args.output_path, f'{filename}_PSF.fits'), data['PSF'].clone().squeeze().numpy(force=True), overwrite=True)
+        fits.writeto(os.path.join(args.output_path, 'psf.fits'), data['PSF'].clone().squeeze().numpy(force=True), overwrite=True)
         # create operator for DC layer inside R2D2Net
         op_R2D2Net = gen_op_R2D2Net(op.im_size, 
                                     data,

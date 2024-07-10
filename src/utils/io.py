@@ -217,7 +217,7 @@ def get_data(args, device, res_device, filename):
         dirty = op.backproj_data(y * nWimag).to(device)
         dirty_time = timeit.default_timer() - ts
         print(f'INFO: time to compute dirty image (normalized backprojected data): {dirty_time:.6f} sec')
-        fits.writeto(os.path.join(args.output_path, f'{filename}_dirty.fits'), 
+        fits.writeto(os.path.join(args.output_path, 'dirty.fits'), 
                      dirty.clone().squeeze().numpy(force=True), 
                      overwrite=True)
     

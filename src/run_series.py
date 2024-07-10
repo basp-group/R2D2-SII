@@ -133,10 +133,27 @@ if __name__ == "__main__":
     # save reconstruction and residual dirty images
     if args.save_all_outputs:
         for i in range(args.num_iter-1):
-            fits.writeto(os.path.join(args.output_path, f'{filename}_rec_N{i+1}.fits'), rec_dict[f'N{i+1}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
-            fits.writeto(os.path.join(args.output_path, f'{filename}_res_N{i+1}.fits'), res_dict[f'N{i+1}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
-    fits.writeto(os.path.join(args.output_path, f'{filename}_model_image.fits'), rec_dict[f'N{total_num_iter}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
-    fits.writeto(os.path.join(args.output_path, f'{filename}_residual_image.fits'), res_dict[f'N{total_num_iter}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
+            if args.layers == 1:
+                fits.writeto(os.path.join(args.output_path, 'R2D2_rec_N{i+1}.fits'),
+                             rec_dict[f'N{i+1}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
+                fits.writeto(os.path.join(args.output_path, 'R2D2_res_N{i+1}.fits'),
+                             res_dict[f'N{i+1}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
+            else:
+                fits.writeto(os.path.join(args.output_path, 'R3D3_rec_N{i+1}.fits'),
+                             rec_dict[f'N{i + 1}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
+                fits.writeto(os.path.join(args.output_path, 'R3D3_res_N{i+1}.fits'),
+                             res_dict[f'N{i + 1}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
+    if args.layers == 1:
+        fits.writeto(os.path.join(args.output_path, 'R2D2_model_image.fits'),
+                     rec_dict[f'N{total_num_iter}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
+        fits.writeto(os.path.join(args.output_path, 'R2D2_residual_dirty_image.fits'),
+                     res_dict[f'N{total_num_iter}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
+    else:
+        fits.writeto(os.path.join(args.output_path, 'R3D3_model_image.fits'),
+                     rec_dict[f'N{total_num_iter}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
+        fits.writeto(os.path.join(args.output_path, 'R3D3_residual_dirty_image.fits'),
+                     res_dict[f'N{total_num_iter}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
+
 
     print('-' * 10)
     print('** Evaluation metrics')

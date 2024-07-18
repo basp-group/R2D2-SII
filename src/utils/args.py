@@ -29,14 +29,25 @@ def parse_yaml_file():
     parser = argparse.ArgumentParser()
     parser.add_argument('--yaml_file', type=str, required=True,
                     help='Path to yaml file containing all the arguments.')
+    parser.add_argument('--im_dim_x', type=int, default=None)
+    parser.add_argument('--im_dim_y', type=int, default=None)
     parser.add_argument('--data_file', type=str, default=None)
     parser.add_argument('--output_path', type=str, default=None)
     parser.add_argument('--super_resolution', type=float, default=None)
-    parser.add_argument('--ckpt_path', type=str, default=None)
-    parser.add_argument('--gdth_file', type=str, default=None)
+    parser.add_argument('--gen_nWimag', action='store_true')
+    parser.add_argument('--weight_type', choices=['briggs', 'uniform', 'none'], default=None)
+    parser.add_argument('--weight_gridsize', type=float, default=None)
+    parser.add_argument('--weight_robustness', type=float, default=None)
+    parser.add_argument('--save_all_outputs', action='store_true')
     parser.add_argument('--series', type=SeriesEnum, default=None)
-    parser.add_argument('--layers', type=LayersEnum, default=None)
     parser.add_argument('--num_iter', type=int, default=None)
+    parser.add_argument('--layers', type=LayersEnum, default=None)
+    parser.add_argument('--ckpt_path', type=str, default=None)
+    parser.add_argument('--res_on_gpu', action='store_true')
+    parser.add_argument('--gdth_file', type=str, default=None)
+    parser.add_argument('--target_dynamic_range', type=float, default=None)
+    parser.add_argument('--cpus', type=int, default=None)
+    parser.add_argument('--verbose', type=int, default=None)
     args = parser.parse_args()
     return args
 
@@ -106,7 +117,7 @@ class CommonArgs(BaseModel):
     
     # imaging weight
     gen_nWimag: bool = False
-    natural_weight: bool = False
+    natural_weight: bool = True
     weight_type: WeightTypeEnum = WeightTypeEnum.briggs
     weight_gridsize: float = 2
     weight_robustness: WeightRobustnessEnum = WeightRobustnessEnum.zero
@@ -161,13 +172,6 @@ class InferenceArgs(CommonArgs):
     
     # metrics
     target_dynamic_range: float = 0.0
-    
-    # validation
-    @field_validator('gdth_file', mode='before')
-    @classmethod
-    def _check_empty(cls, v):
-        if type(v) == str and len(v) == 0:
-            return None
     
     @field_validator('data_file')
     @classmethod

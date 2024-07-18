@@ -226,12 +226,15 @@ def get_data(args, device, res_device, filename):
         gdth = read_fits_as_tensor(args.gdth_file).to(device)
     else:
         gdth = 0.
+        
+    psf = op.gen_PSF(oversampling=1, normalize=True)
     
     data = {'dirty': dirty, 
              'gdth': gdth, 
              'uv': uv,
              'nWimag': nWimag,
-             'fname': filename}
+             'fname': filename,
+             'psf': psf}
     return data, op, dirty_time
 
 class Data_N1(Dataset):

@@ -23,7 +23,9 @@ if __name__ == "__main__":
     filename = str(args.data_file).split('/')[-1].split('.mat')[0].split('.fits')[0]
     total_num_iter = args.num_iter
     save_output = args.save_all_outputs
+    print(args)
     compute_metrics = False if args.gdth_file is None else True
+    print(compute_metrics)
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     res_device = device if args.res_on_gpu else torch.device('cpu')
     
@@ -56,15 +58,18 @@ if __name__ == "__main__":
     if args.layers > 1:
         # create PSF with 2x FOV
         time_PSF = timeit.default_timer()
-        data['PSF'] = op.gen_PSF(oversampling=2, normalize=True)
+        data['PSF_2x_img_size'] = op.gen_PSF(oversampling=2, normalize=True)
         print(f'INFO: time to compute the PSF needed in R2D2-Net: {timeit.default_timer() - time_PSF:.6f} sec')
-        fits.writeto(os.path.join(args.output_path, 'psf.fits'), data['PSF'].clone().squeeze().numpy(force=True), overwrite=True)
+        fits.writeto(os.path.join(args.output_path, 'psf_2x_img_size.fits'), data['PSF_2x_img_size'].clone().squeeze().numpy(force=True), overwrite=True)
         # create operator for DC layer inside R2D2Net
         op_R2D2Net = gen_op_R2D2Net(op.im_size, 
                                     data,
                                     device)
     else:
         op_R2D2Net = None
+        
+    fits.writeto(os.path.join(args.output_path, 'dirty.fits'), data['dirty'].clone().squeeze().numpy(force=True), overwrite=True)
+    fits.writeto(os.path.join(args.output_path, 'psf.fits'), data['psf'].clone().squeeze().numpy(force=True), overwrite=True)
     
     # normalize dirty image and ground truth by mean of dirty image
     data['dirty_n'], data['mean'] = normalize_instance(data['dirty'], eps=1e-110)
@@ -134,24 +139,24 @@ if __name__ == "__main__":
     if args.save_all_outputs:
         for i in range(args.num_iter-1):
             if args.layers == 1:
-                fits.writeto(os.path.join(args.output_path, 'R2D2_rec_N{i+1}.fits'),
+                fits.writeto(os.path.join(args.output_path, f'R2D2_N{i+1}_model_image.fits'),
                              rec_dict[f'N{i+1}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
-                fits.writeto(os.path.join(args.output_path, 'R2D2_res_N{i+1}.fits'),
+                fits.writeto(os.path.join(args.output_path, f'R2D2_N{i+1}_normalised_residual_dirty_image.fits'),
                              res_dict[f'N{i+1}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
             else:
-                fits.writeto(os.path.join(args.output_path, 'R3D3_rec_N{i+1}.fits'),
+                fits.writeto(os.path.join(args.output_path, f'R3D3_{args.layers}L_N{i+1}_model_image.fits'),
                              rec_dict[f'N{i + 1}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
-                fits.writeto(os.path.join(args.output_path, 'R3D3_res_N{i+1}.fits'),
+                fits.writeto(os.path.join(args.output_path, f'R3D3_{args.layers}L_N{i+1}_normalised_residual_dirty_image.fits'),
                              res_dict[f'N{i + 1}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
     if args.layers == 1:
         fits.writeto(os.path.join(args.output_path, 'R2D2_model_image.fits'),
                      rec_dict[f'N{total_num_iter}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
-        fits.writeto(os.path.join(args.output_path, 'R2D2_residual_dirty_image.fits'),
+        fits.writeto(os.path.join(args.output_path, 'R2D2_normalised_residual_dirty_image.fits'),
                      res_dict[f'N{total_num_iter}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
     else:
-        fits.writeto(os.path.join(args.output_path, 'R3D3_model_image.fits'),
+        fits.writeto(os.path.join(args.output_path, f'R3D3_{args.layers}L_model_image.fits'),
                      rec_dict[f'N{total_num_iter}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
-        fits.writeto(os.path.join(args.output_path, 'R3D3_residual_dirty_image.fits'),
+        fits.writeto(os.path.join(args.output_path, f'R3D3_{args.layers}L_normalised_residual_dirty_image.fits'),
                      res_dict[f'N{total_num_iter}'].clone().squeeze().detach().cpu().numpy(), overwrite=True)
 
 

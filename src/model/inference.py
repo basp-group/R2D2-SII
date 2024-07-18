@@ -20,7 +20,7 @@ def forward(args, i, net, res_n, output_n, data, op_R2D2Net=None, device=None):
                 del res_tmp
             if j < (args.layers - 1):
                 output *= (mean.to(device) + 1e-110)
-                res_tmp = op_R2D2Net.gen_res_PSF(data['dirty'], output, PSF=data['PSF'])
+                res_tmp = op_R2D2Net.gen_res_PSF(data['dirty'], output, PSF=data['PSF_2x_img_size'])
                 output, mean = T.normalize_instance(output, eps=1e-110)
                 res_tmp = T.normalize(res_tmp, mean, eps=1e-110)
     output = torch.clip(output * (mean + 1e-110), min=0, max=None)

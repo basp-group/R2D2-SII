@@ -2,13 +2,16 @@
 ![language](https://img.shields.io/badge/language-python-orange.svg)
 [![license](https://img.shields.io/badge/license-GPL--3.0-brightgreen.svg)](LICENSE)
 
-- [R2D2: **R**esidual-to-**R**esidual **D**NN series for high-**D**ynamic range imaging](#R2D2-Algorithm)
-   - [Description](#description)
-   - [Dependencies](#dependencies)
-   - [Imaging](#imaging)
-     - [Input files](#input-files)
-     - [Usage & example](#usage-and-example)
-   - [Training](#training)
+- [R2D2 Algorithm](#r2d2-algorithm)
+  - [Description](#description)
+  - [Dependencies](#dependencies)
+  - [Imaging](#imaging)
+    - [Input files](#input-files)
+      - [Trained DNN series](#trained-dnn-series)
+      - [Data (measurement) file](#data-measurement-file)
+      - [Groundtruth file](#groundtruth-file)
+    - [Usage and example](#usage-and-example)
+  - [Training](#training)
 
 ## Description
 The R2D2 algorithm takes a hybrid structure between a Plug-and-Play (PnP) algorithm and a learned version of the well-known Matching Pursuit algorithm. Its reconstruction is formed as a series of residual images, iteratively estimated as outputs of iteration-specific Deep Neural Networks (DNNs), each taking the previous iteration’s image estimate and associated back-projected data residual as inputs.  The R2D2 algorithm comes in two incarnations. The first uses the well-known U-Net architecture for
@@ -81,23 +84,31 @@ The current code takes as input data a measurement file in ``.mat`` format conta
 The groundtruth file `$GT_FILE` is in `.fits` format. The file is optional and is used to compute the reconstruction evaluation metrics. An example file `3c353_GTfits.fits` is provided in the folder [`$R2D2/data/3c353/`](data/3c353/).
 
 ### Usage and example
-The R2D2 algorithm (R2D2/R3D3) can be run using the following command from the terminal. The final reconstructions which consist of the image estimate and associated residual dirty image (i.e., back-projected residual data) are saved in `$RESULTS_DIR`. The intermediate reconstructions (outputs of each iteration) can also be saved by using the `--save_all_outputs` argument.
+The R2D2 algorithm (R2D2/R3D3) can be run using the following command from the terminal, specifying the path to the configuration file in `.yaml` format, an example can be found [here](config/imaging/R2D2.yaml):
 ``` Python
-python3 ./src/run_series.py \
---data_file $DATA_FILE        `# Path to the input .mat data file.` \
---ckpt_path $CHECKPOINT_DIR   `# Path to the directory of the DNN checkpoints.` \
---output_path $RESULTS_DIR    `# Path to the final fits files.` \
---series $INCARNATION         `# Incarnation of the R2D2 algorithm: "R2D2" or "R3D3".` \
---num_iter $I                 `# Number of DNNs in the R2D2/R3D3 series` \
---layers $J                   `# Number of network layers in the DNN architecture. Currently acceptable values 1, 3, 6.` \
---super_resolution 1.5        `# Super resolution factor.` \
---im_dim_x 512                `# Image width.` \
---im_dim_y 512                `# Image height.` \
---save_all_outputs            `# (optional) Save all intermediate outputs, otherwise only final iteration results will be saved.` \
---gdth_file $GT_FILE          `# (optional) Path to the ground truth fits file.` \
---target_dynamic_range $DR    `# (optional) Target dynamic range for the computation of the logSNR metric when the groundtruth is available.` \
---res_on_gpu                  `# (optional) Compute residual dirty images on GPU to significantly accelerate overall imaging time.` \
---operator_type $OP_TYPE      `# (optional) NUFFT interpolation: "table" or "sparse_matrix". Default: "table" which is faster, "sparse_matrix" is relatively more accurate.`
+python3 ./src/imager.py --yaml_file ./config/imaging/R2D2.yaml
+```
+
+The necessary arguments in the configuration files are listed and explained below. The final reconstructions which consist of the image estimate and associated residual dirty image (i.e., back-projected residual data) are saved in `$RESULTS_DIR`. The intermediate reconstructions (outputs of each iteration) can also be saved by using the `--save_all_outputs` argument.
+``` yaml
+im_dim_x: 512                # (int) Image width. 
+im_dim_y: 512                # (int) Image height. 
+data_file: $DATA_FILE        # (str) Path to the input .mat data file. 
+output_path: $RESULTS_DIR    # (str) Path to the final fits files. 
+super_resolution: 1.5        # (float) Super resolution factor. 
+save_all_outputs: False      # (bool, optional) Save all intermediate outputs, otherwise only final iteration results will be saved. 
+gen_nWimag: True             # (bool, optional) Generate imaging weights from the sampling pattern. 
+weight_type: briggs          # (str) Type of imaging weights.
+weight_robustness: 0         # (float) Briggs weighting robutness parameter.
+weight_gridsize: 2           # (float) Briggs weighting grid oversampling size.
+series: $INCARNATION         # (str) Incarnation of the R2D2 algorithm: "R2D2" or "R3D3". 
+num_iter: $I                 # (int) Number of DNNs in the R2D2/R3D3 series 
+layers: $J                   # (int) Number of network layers in the DNN architecture. Currently acceptable values 1, 3, 6. 
+ckpt_path: $CHECKPOINT_DIR   # (str) Path to the directory of the DNN checkpoints. 
+res_on_gpu: True             # (bool, optional) Compute residual dirty images on GPU to significantly accelerate overall imaging time. 
+operator_type: $OP_TYPE      # (str, optional) NUFFT interpolation: "table" or "sparse_matrix". Default: "table" which is faster, "sparse_matrix" is relatively more accurate.
+gdth_file: $GT_FILE          # (str, optional) Path to the ground truth fits file. 
+target_dynamic_range: $DR    # (float, optional) Target dynamic range for the computation of the logSNR metric when the groundtruth is available. 
 ```
 - **Notes:**
    - The parameter `layers` (`$J`) takes different values depending on the considered incarnation of the R2D2 algorithm.
@@ -107,7 +118,7 @@ python3 ./src/run_series.py \
    - To run the first term in the R2D2 (respectively, R3D3) series which corresponds to the end-to-end DNN U-Net (respectively, R2D2-Net) set `num_iter` (`$I`)  to `1`.
    - The parameter `target_dyanamic_range` (`$DR`) is optional and is used to compute the logSNR metric when the groundtruth image is available.
 
-   - Examples are provided as bash shell scripts in [`$R2D2/example`](example).
+   - Examples are provided as bash shell scripts in [`$R2D2/scripts/imager.sh`](scripts/imager.sh).
 
  ## Training
  Detailed instructions on the training will be available soon.

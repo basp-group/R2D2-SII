@@ -4,4 +4,4 @@ tensorboard==2.16.1
 torchkbnufft==1.4.0
 torchmetrics==0.7.0
 tqdm==4.66.2
-pydantic
+pydantic==2.7.1

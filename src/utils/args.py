@@ -120,7 +120,7 @@ class CommonArgs(BaseModel):
     natural_weight: bool = True
     weight_type: WeightTypeEnum = WeightTypeEnum.briggs
     weight_gridsize: float = 2
-    weight_robustness: WeightRobustnessEnum = WeightRobustnessEnum.zero
+    weight_robustness: float = 0
     weight_robustness_min: float = -1.
     weight_robustness_max: float = 1.
     

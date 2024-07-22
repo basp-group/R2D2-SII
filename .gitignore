@@ -7,3 +7,4 @@ ckpt/
 results/
 *.ipynb
 __pycache__/
+r2d2_env/

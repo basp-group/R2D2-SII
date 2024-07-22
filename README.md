@@ -122,4 +122,3 @@ target_dynamic_range: $DR    # (float, optional) Target dynamic range for the co
 
  ## Training
  Detailed instructions on the training will be available soon.
-
